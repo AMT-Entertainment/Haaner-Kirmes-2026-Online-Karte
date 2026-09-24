@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1a73e8">
+<meta name="description" content="Haaner Kirmes 2026 – interaktive Karte aller Fahrgeschäfte mit Navigation, Öffnungszeiten und Programm. 25.–29. September, Haan Innenstadt.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kirmes 2026">
+<link rel="apple-touch-icon" href="https://haaner-kirmes.de/wp-content/uploads/2018/12/cropped-logo-haaner-kirmes_60.png">
+<title>Haaner Kirmes 2026 — Karte</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#202124; --muted:#5f6368; --bg-0:#ffffff; --bg-1:#ffffff; --bg-2:#f1f3f4;
+    --card:#ffffff; --card-edge:#e8eaed; --blue:#1a73e8; --blue-dark:#174ea6;
+    --amber:#f9ab00; --amber-dark:#a66a00; --red:#ea4335;
+    --shadow-sm:0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+    --shadow-md:0 1px 3px rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{font-family:'Inter',Roboto,system-ui,sans-serif;color:var(--ink);background:var(--bg-0);overflow:hidden;}
+  .app{height:100vh;display:flex;flex-direction:column;}
+
+  header{
+    display:flex;align-items:center;gap:10px;padding:10px 16px;
+    background:#fff;color:var(--ink);border-bottom:1px solid var(--card-edge);
+    z-index:1000;position:relative;flex:none;
+  }
+  .brand{flex:1;display:flex;align-items:center;gap:9px;min-width:0;}
+  .header-actions{display:flex;gap:8px;align-items:center;flex:none;}
+  .loc-btn{
+    display:inline-flex;align-items:center;gap:7px;background:var(--blue);color:#fff;border:none;
+    padding:9px 14px;border-radius:999px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
+    box-shadow:var(--shadow-sm);white-space:nowrap;
+  }
+  .loc-btn:hover{background:var(--blue-dark);}
+  .loc-btn.active{background:#0b5f0b;}
+  .loc-btn svg{width:16px;height:16px;}
+  .brand .mark{font-size:21px;line-height:1;}
+  .brand .logo{height:36px;width:auto;display:block;border-radius:6px;background:#fff;}
+  .brand h1{font-weight:700;font-size:15.5px;margin:0;letter-spacing:-.1px;}
+  .brand p{margin:0;font-size:11.5px;color:var(--muted);}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--card-edge);color:var(--blue);
+    padding:9px 14px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;
+    text-decoration:none;font-family:inherit;transition:background .12s;
+  }
+  .btn:hover{background:#f6f9fe;}
+  .btn.primary{background:var(--blue);color:#fff;border:none;}
+  .btn.primary:hover{background:var(--blue-dark);}
+  .btn svg{width:15px;height:15px;flex:none;}
+
+  main{flex:1;display:flex;min-height:0;position:relative;}
+  aside{width:340px;flex:none;display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--card-edge);z-index:900;}
+  .search-wrap{padding:12px;}
+  .search{
+    position:relative;background:var(--bg-2);border-radius:24px;display:flex;align-items:center;
+    box-shadow:var(--shadow-sm);
+  }
+  .search svg{position:absolute;left:14px;width:17px;height:17px;color:var(--muted);pointer-events:none;}
+  .search input{
+    width:100%;padding:12px 14px 12px 42px;border-radius:24px;border:none;background:transparent;
+    font-size:14.5px;font-family:inherit;color:var(--ink);outline:none;
+  }
+  .search input::placeholder{color:var(--muted);}
+
+  .result-count{padding:0 20px 8px;font-size:12.5px;color:var(--muted);}
+  .open-status{margin:0 12px 8px;padding:9px 13px;border-radius:12px;font-size:12.5px;font-weight:700;
+    background:var(--bg-2);color:var(--ink);line-height:1.45;cursor:default;}
+  .open-status.open{background:#e6f4ea;color:#0b5f0b;}
+  .open-status.soon{background:#fef7e0;color:var(--amber-dark);}
+  .open-status.shut{background:#f1f3f4;color:var(--muted);}
+  .open-status small{display:block;font-weight:500;font-size:11px;opacity:.85;}
+
+  .list{flex:1;overflow-y:auto;padding:2px 8px 12px;}
+  .ride-card{display:flex;gap:12px;align-items:flex-start;padding:10px 8px;border-radius:10px;cursor:pointer;margin-bottom:2px;}
+  .ride-card:hover{background:var(--bg-2);}
+  .ride-card.active{background:#e8f0fe;}
+  .icon-badge{
+    flex:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    position:relative;color:#fff;
+  }
+  .icon-badge.ride{background:var(--amber);}
+  .icon-badge.kids{background:var(--blue);}
+  .icon-badge svg{width:19px;height:19px;}
+  .new-dot{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;font-size:7.5px;font-weight:800;
+    border-radius:999px;padding:2px 4px;line-height:1;box-shadow:0 0 0 2px #fff;}
+  .ride-meta{min-width:0;padding-top:1px;}
+  .ride-meta .name{font-weight:600;font-size:14px;line-height:1.25;}
+  .ride-meta .loc{font-size:12px;color:var(--muted);margin-top:2px;display:flex;gap:4px;align-items:center;}
+  .ride-meta .loc svg{width:11px;height:11px;flex:none;}
+  .tba{font-style:italic;opacity:.75;}
+  .sidebar-footer{padding:10px 16px 14px;border-top:1px solid var(--card-edge);font-size:11px;color:var(--muted);}
+  .sidebar-footer a{color:var(--blue);text-decoration:none;}
+  .sidebar-footer a:hover{text-decoration:underline;}
+  .visit-counter{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;font-weight:700;color:var(--ink);}
+  .visit-counter a{font-size:11px;font-weight:400;}
+
+  .map-wrap{flex:1;position:relative;min-width:0;}
+  #map{width:100%;height:100%;background:#e8eaed;}
+
+  .legend{
+    position:absolute;left:12px;top:12px;z-index:700;background:#fff;
+    border-radius:8px;padding:9px 12px;font-size:12px;color:var(--ink);box-shadow:var(--shadow-sm);
+    display:flex;gap:14px;align-items:center;
+  }
+  .legend .item{display:flex;align-items:center;gap:6px;}
+  .legend .dot{width:10px;height:10px;border-radius:50%;flex:none;}
+  .legend .dot.ride{background:var(--amber);}
+  .legend .dot.kids{background:var(--blue);}
+
+  /* ---- filter chips + programm ---- */
+  .chip-row{display:flex;gap:6px;padding:0 12px 8px;flex-wrap:wrap;align-items:center;}
+  .chip{border:1px solid var(--card-edge);background:#fff;border-radius:999px;padding:7px 12px;font-size:12.5px;
+    font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;}
+  .chip:hover{background:var(--bg-2);}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .prog-btn{margin:0 12px 8px;width:calc(100% - 24px);justify-content:center;}
+  .event{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--card-edge);font-size:13px;text-align:left;align-items:flex-start;}
+  .event:last-child{border-bottom:none;}
+  .event .day{flex:none;background:var(--bg-2);border-radius:10px;padding:6px 9px;font-weight:800;font-size:12px;text-align:center;min-width:52px;}
+  .event b{display:block;font-size:13.5px;}
+  .event span{color:var(--muted);font-size:12.5px;}
+
+  .map-fabs{position:absolute;right:12px;bottom:88px;z-index:700;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+  .fab-label{background:#fff;border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;color:var(--ink);
+    box-shadow:var(--shadow-md);cursor:pointer;border:none;font-family:inherit;}
+  .fab-label:hover{background:#f6f9fe;}
+  .fab{
+    width:44px;height:44px;border-radius:50%;background:#fff;border:none;box-shadow:var(--shadow-md);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--blue);
+  }
+  .fab:hover{background:#f6f9fe;}
+  .fab svg{width:22px;height:22px;}
+  .fab.spinning svg{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .geo-status{
+    position:absolute;left:12px;bottom:12px;z-index:700;background:#fff;
+    border-radius:8px;padding:9px 13px;font-size:12.5px;color:var(--muted);max-width:270px;box-shadow:var(--shadow-sm);display:none;
+  }
+  .geo-status.show{display:block;}
+  .geo-status b{color:var(--ink);}
+
+  /* ---- markers ---- */
+  .div-pin{background:none;border:none;}
+  .pin{position:relative;width:34px;height:34px;cursor:pointer;}
+  .pin::before{
+    content:'';position:absolute;inset:0;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+    box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid #fff;
+  }
+  .pin.ride::before{background:var(--amber);}
+  .pin.kids::before{background:var(--blue);}
+  .pin .pin-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+  .pin .pin-icon svg{width:16px;height:16px;color:#fff;}
+  .pin .new-dot{position:absolute;top:-4px;right:1px;box-shadow:0 0 0 2px #fff;}
+
+  .you-dot{width:18px;height:18px;border-radius:50%;background:var(--blue);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+  .you-pulse{width:18px;height:18px;border-radius:50%;background:rgba(26,115,232,.25);position:absolute;top:0;left:0;
+    animation:pulse 2s ease-out infinite;}
+  @keyframes pulse{0%{transform:scale(1);opacity:.8;}100%{transform:scale(2.6);opacity:0;}}
+
+  /* ---------- Detail panel ---------- */
+  .backdrop{position:fixed;inset:0;background:rgba(32,33,36,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:1200;}
+  .backdrop.show{opacity:1;pointer-events:auto;}
+  .detail{position:fixed;right:0;top:0;bottom:0;width:min(400px,92vw);background:#fff;box-shadow:-2px 0 12px rgba(0,0,0,.2);
+    transform:translateX(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1);z-index:1300;display:flex;flex-direction:column;}
+  .detail.show{transform:translateX(0);}
+  .detail-head{padding:14px 14px 0;display:flex;justify-content:flex-end;}
+  .detail-close{width:34px;height:34px;border-radius:50%;border:none;background:transparent;cursor:pointer;font-size:16px;color:var(--muted);}
+  .detail-close:hover{background:var(--bg-2);}
+  .detail-body{flex:1;overflow-y:auto;padding:2px 22px 22px;}
+  .detail-hero{height:140px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--bg-2);margin-bottom:16px;position:relative;overflow:hidden;}
+  .detail-hero svg{width:70px;height:70px;}
+  .detail-hero .ribbon{position:absolute;top:11px;left:-30px;transform:rotate(-40deg);background:var(--red);color:#fff;font-weight:800;font-size:10.5px;padding:4px 38px;}
+  .detail h2{font-size:20px;font-weight:700;margin:0 0 2px;letter-spacing:-.2px;}
+  .detail .subtitle{color:var(--muted);font-size:13px;margin-bottom:14px;}
+  .meta-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--card-edge);font-size:13.5px;align-items:flex-start;}
+  .meta-row svg{width:18px;height:18px;flex:none;color:var(--muted);margin-top:1px;}
+  .meta-row .k{color:var(--muted);min-width:76px;flex:none;}
+  .badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 4px;}
+  .badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;}
+  .badge.new{background:#fce8e6;color:#c5221f;}
+  .badge.ride{background:#fef7e0;color:var(--amber-dark);}
+  .badge.kids{background:#e8f0fe;color:var(--blue-dark);}
+  .desc{margin:14px 0;font-size:13.5px;line-height:1.6;color:#3c4043;}
+  .actions{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+  .actions .btn{justify-content:center;width:100%;padding:11px 13px;font-size:13.5px;}
+  .note{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.5;}
+
+  .toast{position:fixed;left:50%;top:16px;transform:translateX(-50%) translateY(-160%);background:var(--ink);color:#fff;
+    border-radius:8px;padding:10px 16px;font-size:12.5px;box-shadow:var(--shadow-md);z-index:2100;transition:transform .25s;max-width:90vw;text-align:center;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  /* ---- location banner + navigation ---- */
+  .loc-banner{
+    position:absolute;left:12px;right:68px;top:52px;z-index:700;background:#fff;border-radius:12px;
+    padding:12px 14px;box-shadow:var(--shadow-md);display:flex;gap:10px;align-items:center;font-size:13px;
+  }
+  .loc-banner.hidden{display:none;}
+  .loc-banner .txt{flex:1;min-width:0;}
+  .loc-banner b{display:block;font-size:13.5px;}
+  .loc-banner span{color:var(--muted);font-size:12.5px;}
+  .loc-banner .btn{padding:9px 12px;font-size:12.5px;}
+  .nav-bar{
+    position:absolute;left:12px;right:12px;top:12px;z-index:800;background:var(--ink);color:#fff;border-radius:14px;
+    padding:10px 12px;box-shadow:var(--shadow-md);display:none;align-items:center;gap:12px;
+  }
+  .nav-bar.show{display:flex;}
+  .nav-arrow{
+    width:48px;height:48px;flex:none;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:26px;color:var(--blue);transition:transform .2s;transform:rotate(0deg);
+  }
+  .nav-info{flex:1;min-width:0;}
+  .nav-info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .nav-info span{font-size:12.5px;opacity:.85;}
+  .nav-stop{background:var(--red);color:#fff;border:none;border-radius:999px;padding:10px 14px;font-weight:700;
+    cursor:pointer;font-size:13px;font-family:inherit;flex:none;}
+  .nav-progress{height:4px;background:rgba(255,255,255,.25);border-radius:99px;margin-top:6px;overflow:hidden;}
+  .nav-progress i{display:block;height:100%;background:#fff;border-radius:99px;width:0%;transition:width .5s;}
+
+  /* ---- ride images ---- */
+  .ride-thumb{flex:none;width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--bg-2);}
+  .ride-thumb-fallback{flex:none;width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;}
+  .ride-thumb-fallback.ride{background:var(--amber);}
+  .ride-thumb-fallback.kids{background:var(--blue);}
+  .ride-thumb-fallback svg{width:26px;height:26px;}
+  .detail-hero{height:200px;}
+  .detail-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+  .detail-hero.icon-only{height:140px;}
+  .photo-credit{font-size:11px;color:var(--muted);margin-top:6px;}
+  .photo-credit a{color:var(--blue);text-decoration:none;}
+  .tba-pin{opacity:.75;}
+  .tba-pin.pin::before{background:#9aa0a6 !important;}
+
+  /* ---- welcome / disclaimer ---- */
+  .welcome-modal{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;background:rgba(32,33,36,.55);padding:16px;}
+  .welcome-modal.show{display:flex;}
+  .welcome-card{background:#fff;border-radius:18px;padding:22px;width:min(430px,95vw);max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-md);text-align:center;}
+  .welcome-card .big{font-size:40px;}
+  .welcome-card h2{margin:8px 0 4px;font-size:19px;}
+  .welcome-card .counter{display:block;background:var(--bg-2);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;margin:8px 0;min-height:44px;}
+  .welcome-card .counter a{font-size:11px;}
+  .nav-next{background:rgba(255,255,255,.14);border-radius:8px;padding:6px 9px;font-size:12px;margin-top:6px;line-height:1.4;}
+  .nav-mute{background:#fff;color:var(--ink);border:none;border-radius:999px;width:40px;height:40px;font-size:18px;font-weight:700;
+    cursor:pointer;flex:none;}
+  .welcome-card p{font-size:13px;line-height:1.6;color:#3c4043;text-align:left;margin:10px 0;}
+  .welcome-card label{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);margin:10px 0;text-align:left;cursor:pointer;}
+  .welcome-card .row{display:flex;gap:8px;margin-top:6px;}
+  .welcome-card .row .btn{flex:1;justify-content:center;padding:12px;}
+
+  ::-webkit-scrollbar{width:9px;}
+  ::-webkit-scrollbar-thumb{background:var(--card-edge);border-radius:99px;}
+
+  @media (max-width: 860px){
+    aside{position:fixed;left:0;right:0;bottom:0;top:auto;height:46vh;width:auto;border-right:none;border-top:1px solid var(--card-edge);
+      border-radius:16px 16px 0 0;z-index:950;transform:translateY(calc(100% - 84px));transition:transform .25s;box-shadow:0 -4px 20px rgba(0,0,0,.18);}
+    aside.expanded{transform:translateY(0);}
+    .drag-handle{width:38px;height:5px;border-radius:99px;background:var(--card-edge);margin:9px auto 2px;}
+    header p{display:none;}
+    .detail{width:100vw;}
+    .map-fabs{bottom:22px;}
+    .loc-banner{right:12px;top:64px;}
+    .loc-btn span{display:none;}
+    .loc-btn{padding:9px 11px;}
+    .nav-bar{top:64px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <img class="logo" src="https://haaner-kirmes.de/wp-content/uploads/2018/12/cropped-logo-haaner-kirmes_60.png" alt="Haaner Kirmes Logo" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;mark&quot;>🎡</span>'">
+      <div><h1>Haaner Kirmes 2026</h1><p>25.–29. September · Haan Innenstadt</p></div>
+    </div>
+    <div class="header-actions">
+      <button class="loc-btn" id="headerLocBtn" title="Standort aktivieren für Navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+        <span id="headerLocLabel">Standort aktivieren</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <aside id="sidebar">
+      <div class="drag-handle" id="dragHandle"></div>
+      <div class="search-wrap">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="searchInput" type="text" placeholder="Fahrgeschäft suchen …" autocomplete="off">
+        </div>
+      </div>
+      <div class="result-count" id="resultCount"></div>
+      <div class="open-status shut" id="openStatus">🕑 …</div>
+      <button class="btn prog-btn" id="progBtn">🎉 Programm &amp; Highlights</button>
+      <div class="chip-row" id="chipRow">
+        <button class="chip on" data-cat="all">Alle</button>
+        <button class="chip" data-cat="thrill">🔥 Thrill</button>
+        <button class="chip" data-cat="family">🎡 Familie</button>
+        <button class="chip" data-cat="kids">🧸 Kinder</button>
+      </div>
+      <div class="list" id="list"></div>
+      <div class="sidebar-footer">
+        <div class="visit-counter"><span>👋 Besucher:</span><span id="sfc7ttluwspchn5enssu2nan9se1xlxe464"></span><script type="text/javascript" src="https://counter11.optistats.ovh/private/counter.js?c=7ttluwspchn5enssu2nan9se1xlxe464&down=async" async></script><noscript><a href="https://www.freecounterstat.com/geozoom.php?c=7ttluwspchn5enssu2nan9se1xlxe464&base=counter11&type_clic=1" title="web page counter"><img src="https://counter11.optistats.ovh/private/freecounterstat.php?c=7ttluwspchn5enssu2nan9se1xlxe464" border="0" title="web page counter" alt="web page counter"></a></noscript></div>
+        <div>Fotos: <a href="https://haaner-kirmes.de/fahrgeschaefte/" target="_blank" rel="noopener">haaner-kirmes.de ↗</a> · Karte © OpenStreetMap · <a href="https://www.freecounterstat.com/geozoom.php?c=7ttluwspchn5enssu2nan9se1xlxe464&base=counter11&type_clic=1" target="_blank" rel="noopener">📊 Statistiken</a> · <a href="#" id="openWelcome">Hinweis</a> · <a href="#" id="openPrivacy">🔒 Datenschutz</a> · <a href="#" id="openInstall">📲 App</a></div>
+      </div>
+    </aside>
+
+    <div class="map-wrap">
+      <div class="nav-bar" id="navBar">
+        <div class="nav-arrow" id="navArrow">➤</div>
+        <div class="nav-info">
+          <b id="navTitle">Navigation</b>
+          <span id="navSub">…</span>
+          <div class="nav-next" id="navNext" style="display:none;"></div>
+          <div class="nav-progress"><i id="navProg"></i></div>
+        </div>
+        <button class="nav-mute" id="navMute" title="Sprachansage an/aus">🔊</button>
+        <button class="nav-stop" id="navStop">Stopp</button>
+      </div>
+      <div class="legend" id="legendBox">
+        <div class="item"><span class="dot ride"></span>Fahrgeschäfte</div>
+        <div class="item"><span class="dot kids"></span>Kinder</div>
+      </div>
+      <div class="loc-banner" id="locBanner">
+        <div class="txt"><b>📍 Standort aktivieren?</b><span>Für Live-Navigation zu den Fahrgeschäften in der App.</span></div>
+        <button class="btn primary" id="bannerLocBtn">Aktivieren</button>
+      </div>
+      <div id="map"></div>
+      <div class="map-fabs">
+        <button class="fab-label" id="locateLabel">📍 Standort anzeigen</button>
+        <button class="fab" id="locateBtn" title="Meinen Standort anzeigen" aria-label="Meinen Standort anzeigen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+        </button>
+      </div>
+      <div class="geo-status" id="geoStatus"></div>
+    </div>
+  </main>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="detail" id="detail">
+  <div class="detail-head"><button class="detail-close" id="detailClose">✕</button></div>
+  <div class="detail-body" id="detailBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="welcome-modal" id="welcomeModal">
+  <div class="welcome-card">
+    <img src="https://haaner-kirmes.de/wp-content/uploads/2018/12/cropped-logo-haaner-kirmes_60.png" alt="Haaner Kirmes" referrerpolicy="no-referrer" style="height:44px;width:auto;" onerror="this.remove()">
+    <h2>Willkommen zur Haaner Kirmes 2026!</h2>
+    <p>Nicht-kommerzielles Fan-Projekt zur Kirmes (25.–29. September) – aus Freude an der Kirmes, ohne Werbung. Alle Angaben ohne Gewähr, offizielle Infos: <a href="https://haaner-kirmes.de/fahrgeschaefte/" target="_blank" rel="noopener">haaner-kirmes.de</a>. <a href="#" id="openPrivacy2">Datenschutz 🔒</a></p>
+    <p>🕑 <b>Öffnungszeiten 2026:</b> Fr 16–24 · Sa 14–1 · So 11–23 · Mo 10–23 · Di 14–23 Uhr (Feuerwerk). Eröffnung Fr um 16 Uhr am Riesenrad.</p>
+    <label><input type="checkbox" id="welcomeHide"> Nicht mehr anzeigen</label>
+    <div class="row">
+      <button class="btn primary" id="welcomeOk">Verstanden – viel Spaß! 🎠</button>
+    </div>
+  </div>
+</div>
+
+<div class="welcome-modal" id="progModal">
+  <div class="welcome-card">
+    <h2>🎉 Programm 2026</h2>
+    <div id="progList"></div>
+    <div class="row">
+      <button class="btn primary" id="progOk">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="welcome-modal" id="installModal">
+  <div class="welcome-card">
+    <h2>📲 Als App installieren</h2>
+    <p><b>iPhone (Safari):</b> Teilen-Symbol ⬆️ → „Zum Home-Bildschirm“ → Hinzufügen.</p>
+    <p><b>Android (Chrome):</b> Menü ⋮ → „Zum Startbildschirm hinzufügen“ bzw. „App installieren“.</p>
+    <p>Danach startet die Kirmes-Karte wie eine echte App – ideal für unterwegs.</p>
+    <div class="row">
+      <button class="btn primary" id="installOk">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="welcome-modal" id="privacyModal">
+  <div class="welcome-card">
+    <h2>🔒 Datenschutz</h2>
+    <p><b>Wir sammeln keine Nutzerdaten.</b> Kein Tracking, keine Cookies, kein Account.</p>
+    <p>Das Einzige, was beim Öffnen mitgezählt wird, ist der öffentliche <b>Besucherzähler</b> (Anbieter freecounterstat.com / optistats.ovh – <a href="https://www.freecounterstat.com/geozoom.php?c=7ttluwspchn5enssu2nan9se1xlxe464&base=counter11&type_clic=1" target="_blank" rel="noopener">Statistiken öffentlich einsehbar ↗</a>). Die Zähler-Anfrage überträgt technisch deine IP an den Anbieter, so wie jeder Webseiten-Aufruf.</p>
+    <p>Dein <b>Standort</b> wird nur verwendet, wenn du „Standort aktivieren“ tippst, und bleibt auf deinem Gerät – außer du rufst externe Routen auf (Google/Apple) oder die In-App-Route (OpenStreetMap/OSRM-Kacheln). Kartenbilder: © OpenStreetMap-Mitwirkende. Fotos: ride-index.de / haaner-kirmes.de (Rechte bei den Betreibern). Sprachausgabe läuft lokal auf deinem Gerät.</p>
+    <div class="row">
+      <button class="btn primary" id="privacyOk">Schließen</button>
+    </div>
+  </div>
+</div>
+
+
+<script type="application/json" id="ridesData">
+[{"id": "riesenrad", "name": "Riesenrad: Sonnenrad", "subtitle": "Der Blick über die Kirmesmeile", "cat": "family", "icon": "ferriswheel", "isNew": false, "operator": "Otto Barth (Bonn)", "location": "Neuer Markt West", "lat": 51.193324, "lng": 7.009631, "desc": "Das große Riesenrad ist traditionell der Startpunkt der Kirmes: Hier findet am Freitag um 16 Uhr die offizielle Eröffnung mit Bürgermeister Vincent Endereß statt. Von oben hat man den besten Überblick über die gesamte Festmeile.", "url": "https://haaner-kirmes.de/riesenrad-sonnenrad/", "rideIndexUrl": "https://ride-index.de/2005/01/13/riesenrad-willenborg-3/"}, {"id": "hawaii", "name": "Hawaii Swing", "subtitle": "Fliegende Ketten mit Tropenflair", "cat": "family", "icon": "swing", "isNew": false, "operator": "Sascha Schaak (Zülpich)", "location": "Windhövelplatz", "lat": 51.193391, "lng": 7.010393, "desc": "Klassisches Kettenkarussell mit Hawaii-Thema: Die Sitze schwingen im Kreis nach außen — ein Muss für alle, die den Fahrtwind lieben, ohne auf Loopings zu stehen.", "url": "https://haaner-kirmes.de/schlittenfahrt-2/", "rideIndexUrl": "https://ride-index.de/2005/01/08/hawaii-swing-schaak/"}, {"id": "nessy", "name": "The Real Nessy", "subtitle": "„Das spritzige Vergnügen“", "cat": "family", "icon": "splash", "isNew": false, "operator": "Hans-Peter Markmann (Bonn)", "location": "Kaiserstraße 5", "lat": 51.191844, "lng": 7.008355, "desc": "Eine Fahrt auf dem Rücken des Ungeheuers von Loch Ness — mit waschechten Wasserspritzern für alle, die an heißen Kirmestagen eine Abkühlung suchen.", "url": "https://haaner-kirmes.de/the-real-nessy/", "rideIndexUrl": "https://ride-index.de/2005/01/11/nessy/"}, {"id": "circuscircus", "name": "Circus Circus", "subtitle": "Rasant, aber familienfreundlich", "cat": "family", "icon": "tent", "isNew": true, "operator": "Circus Circus GmbH & Co. KG (Emstek)", "location": "Neuer Markt", "lat": 51.193203, "lng": 7.010211, "desc": "Neu 2026 in Haan: ein Rundfahrgeschäft mit liebevoll gestalteter Zirkuskulisse, bislang vor allem vom Oktoberfest München bekannt. Rasante, aber familienfreundliche Runden für Jung und Alt.", "url": "https://haaner-kirmes.de/circuscircus/", "rideIndexUrl": "https://ride-index.de/2005/01/04/circus-circus/"}, {"id": "bigben", "name": "Big Ben Tower", "subtitle": "Freier Fall mit Aussicht", "cat": "thrill", "icon": "tower", "isNew": false, "operator": "Dennis Krause GbR (Bielefeld)", "location": "Schillerplatz", "lat": 51.191898, "lng": 7.007958, "desc": "Riesenkettenflieger mit Höhenkick — bis zu 40 Meter hoch, mit schöner Aussicht über den Kirmesplatz. Der genaue Standplatz in Haan wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/bigbentower/", "rideIndexUrl": "https://ride-index.de/2023/07/11/big-ben-tower/"}, {"id": "superhopser", "name": "Super Hopser", "subtitle": "Hüpfvergnügen für Groß und Klein", "cat": "family", "icon": "bounce", "isNew": false, "operator": "Marlon Weihs", "location": "Marktpassage", "lat": 51.192846, "lng": 7.01212, "desc": "Der Schunkler von 1981 sorgt bei bis zu 14 Umdrehungen pro Minute für viel Gelächter — wer nicht aufpasst, landet schnell beim Nachbarn auf dem Schoß. Der genaue Standplatz wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/super-hopser/", "rideIndexUrl": "https://ride-index.de/2005/01/13/super-hopser-weihs/"}, {"id": "jetlag", "name": "Jetlag", "subtitle": "Kreiseln bis der Kopf brummt", "cat": "thrill", "icon": "spin", "isNew": false, "operator": "Mario Weber (Moers)", "location": "Neuer Markt", "lat": 51.193465, "lng": 7.010769, "desc": "Ein schnelles Drehfahrgeschäft mitten auf dem Neuen Markt — für alle, die Zentrifugalkraft lieben. Im Luftfahrt-Look gestaltet, mit Geschwindigkeiten von bis zu 100 km/h.", "url": "https://haaner-kirmes.de/jetlag/", "rideIndexUrl": "https://ride-index.de/2019/05/28/jetlag/"}, {"id": "invader", "name": "Invader", "subtitle": "Breakdance-Neuheit 2026", "cat": "thrill", "icon": "dancer", "isNew": true, "operator": "Marvin Dreßen (Mönchengladbach)", "location": "Neuer Markt", "lat": 51.193048, "lng": 7.009674, "desc": "Ganz neues Rundfahrgeschäft von SAD Maschinenbau, das seine Premiere im Juli 2026 auf der Rheinkirmes Düsseldorf feierte und nun erstmals in Haan gastiert. Platz für 32 Personen in 16 Gondeln.", "url": "https://haaner-kirmes.de/invader/", "rideIndexUrl": "https://ride-index.de/2026/07/17/invader/"}, {"id": "jekyllhyde", "name": "Jekyll & Hyde", "subtitle": "Speed-Fahrgeschäft mit doppeltem Gesicht", "cat": "thrill", "icon": "ghost", "isNew": false, "operator": "Bethel Thelen jr. (Paderborn)", "location": "Dieker Straße", "lat": 51.194004, "lng": 7.012024, "desc": "Kein Geisterbahn-Klassiker, sondern ein rasantes KMG-Speed-Fahrgeschäft: In Einzelsitzen geht es bis zu 42 Meter hoch und mit rund 130 km/h um die Nabe, die auf einer Seite Dr. Jekylls freundliches Gesicht zeigt und auf der Rückseite die Fratze von Mr. Hyde — dazu Nebel-, Feuer- und LED-Effekte.", "url": "https://haaner-kirmes.de/jekyllandhyde/", "rideIndexUrl": "https://ride-index.de/2014/04/23/jekyll-hyde/"}, {"id": "vivacuba", "name": "Viva Cuba", "subtitle": "Laufgeschäft auf 4 Etagen und 5 Ebenen", "cat": "family", "icon": "funhouse", "isNew": true, "operator": "Hartmann & Sohn (Iserlohn)", "location": "Mittelstraße", "lat": 51.194144, "lng": 7.013665, "desc": "Neues Laufgeschäft mit kubanischem Flair — das erste seiner Art in Deutschland, das sich komplett dem Thema Kuba widmet. Wackelböden, Rolltonnen, Zerrspiegel und Wasserspiele über vier Etagen und fünf Ebenen.", "url": "https://haaner-kirmes.de/vivacuba/", "rideIndexUrl": "https://ride-index.de/2005/01/06/viva-cuba-hartmann/"}, {"id": "autoscooter", "name": "Autoscooter Diamond", "subtitle": "Der Kirmes-Klassiker", "cat": "family", "icon": "bumpercar", "isNew": false, "operator": "Hartkopf-Osselmann (Mettmann)", "location": "Alter Markt", "lat": 51.192988, "lng": 7.012421, "desc": "Crashen erlaubt: der traditionelle Autoscooter, erkennbar am markanten Diamanten auf dem Dach, mit 30 modernen Bertazzon-New-York-Fahrzeugen und LED-Beleuchtung.", "url": "https://haaner-kirmes.de/autoscooter/", "rideIndexUrl": "https://ride-index.de/2007/07/10/as-hartkopf-osselmann/"}, {"id": "hoelle", "name": "Fahrt zur Hölle 2.0", "subtitle": "Die runderneuerte Geisterbahn", "cat": "thrill", "icon": "ghost", "isNew": true, "operator": "Hermann Fellerhoff & Söhne (Düsseldorf)", "location": "Rathaus-Parkplatz", "lat": 51.193278, "lng": 7.013633, "desc": "Nach Übernahme durch die als „Grusel-Experten“ bekannte Familie Fellerhoff komplett modernisierte Geisterbahn: 180 Streckenmeter auf zwei Etagen, rund 3 Minuten Fahrzeit — einer der großen Hingucker jeder Kirmes-Saison.", "url": "https://haaner-kirmes.de/fahrtzurhoelle/", "rideIndexUrl": "https://ride-index.de/2005/01/06/fahrt-zur-hoelle/"}, {"id": "musikexpress", "name": "Musik-Express", "subtitle": "Kirmes-Evergreen", "cat": "family", "icon": "musicnote", "isNew": false, "operator": "Eduard Krause KG (Bielefeld)", "location": "Walder Str. / Kaiserstraße", "lat": 51.193412, "lng": 7.014652, "desc": "Musik, Lichter, Tempo: der Musik-Express ist der Evergreen unter den Rundfahrgeschäften und für Generationen von Kirmesbesuchern ein Fixpunkt.", "url": "https://haaner-kirmes.de/musik-express-2/", "rideIndexUrl": "https://ride-index.de/2005/01/10/musik-express-schneider-krause/"}, {"id": "crazydancer", "name": "Crazy Dancer", "subtitle": "Breakdance-Style-Fahrt", "cat": "thrill", "icon": "dancer", "isNew": false, "operator": "Manuel Freiwald (Ankum)", "location": "Kaiserstr. 68, Nebenfahrbahn", "lat": 51.194219, "lng": 7.014534, "desc": "Schnelles Breakdance-Fahrgeschäft (Typ „Scheibenwischer“) in der Nebenfahrbahn der Kaiserstraße — kreiselnd, kippend, mit ordentlich Speed.", "url": "https://haaner-kirmes.de/crazy-dancer/", "rideIndexUrl": "https://ride-index.de/2005/01/04/crazy-dancer/"}, {"id": "hypnotizer", "name": "Hypnotizer", "subtitle": "Pendelschaukel-Neuheit", "cat": "thrill", "icon": "pendulum", "isNew": true, "operator": "Thelen (Paderborn)", "location": "Rathaus-Parkplatz", "lat": 51.193681, "lng": 7.013826, "desc": "Deutschlandweites Unikat: ein KMG „Sicko“, dessen Rückwand ein animierter Sensenmann mit den Gondeln mitverfolgenden Augen ziert. Premiere war im April 2026 auf dem Frühlingsfest Hannover. Der genaue Standplatz in Haan wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/hypnotizer/", "rideIndexUrl": "https://ride-index.de/2026/04/02/hypnotizer/"}, {"id": "pocoloco", "name": "Poco Loco", "subtitle": "„Ein bisschen verrückt“ — Neuheit 2026", "cat": "family", "icon": "funhouse", "isNew": true, "operator": "Maximilian Schultze (Bochum)", "location": "Kaiserstraße", "lat": 51.191966, "lng": 7.009556, "desc": "Eines der sechs neuen Fahrgeschäfte 2026: ein neues Laufgeschäft von Dietz Fahrzeugbau, das im März 2026 auf der Palmkirmes Recklinghausen Premiere feierte und der Kaiserstraße nun mehr Vielfalt verleiht.", "url": "https://haaner-kirmes.de/pocoloco/", "rideIndexUrl": "https://ride-index.de/?s=Poco+Loco"}, {"id": "kids", "name": "Kinder-Fahrgeschäfte", "subtitle": "11 Fahrgeschäfte für die Kleinsten", "cat": "kids", "icon": "carousel", "isNew": false, "operator": "verschiedene Schausteller", "location": "verteilt rund um Alter Markt / Kaiserstraße", "lat": 51.19247, "lng": 7.010694, "desc": "Highway Rally, Toy Story Wheel, Crazy Clown, Kid´s Rally, Mini-Autoscooter, Crazy Time 2, Barock-Kinderflieger, Bounty, Balluna, Kinderkarussell und Willy der Wurm — elf eigene Kinderfahrgeschäfte für alle Altersklassen.", "url": "https://haaner-kirmes.de/kinder-fahrgeschaefte/", "rideIndexUrl": "https://ride-index.de/category/kindergeschaefte-aktiv/"}]
+</script>
+
+<script>
+const INDEX_URL = 'https://haaner-kirmes.de/fahrgeschaefte/';
+const RIDES = JSON.parse(document.getElementById('ridesData').textContent);
+
+/* Ride-Index Fotos (og:image, Quelle: ride-index.de – alle Rechte bei den Fotografen) */
+const RIDE_IMGS = {
+  riesenrad: 'https://ride-index.de/wp-content/uploads/2005/01/Willenborg-Riesenrad-gelb-2019-1.jpg',
+  hawaii: 'https://ride-index.de/wp-content/uploads/2005/01/Schaak-Hawaii-Swing-2026-R.jpg',
+  nessy: 'https://ride-index.de/wp-content/uploads/2005/01/NESSY_Markmann2025Fahrt.jpg',
+  circuscircus: 'https://ride-index.de/wp-content/uploads/2005/01/CIRCUSCIRCUS2026.jpg',
+  bigben: 'https://ride-index.de/wp-content/uploads/2023/07/Krause-BigBenTower-Fahrt-2025-R.jpg',
+  superhopser: 'https://ride-index.de/wp-content/uploads/2005/01/Weiss-Super-Hopser-2025-R.jpg',
+  jetlag: 'https://ride-index.de/wp-content/uploads/2019/05/JETLAG-Weber2026.jpg',
+  invader: 'https://ride-index.de/wp-content/uploads/2026/07/INVADER-Dreessen2026.jpg',
+  jekyllhyde: 'https://ride-index.de/wp-content/uploads/2014/04/JEKYLLANDHYDE-Thelen2026R-2.jpg',
+  vivacuba: 'https://ride-index.de/wp-content/uploads/2005/01/VIVACUBA_Hartmann2025-3.jpg',
+  autoscooter: 'https://ride-index.de/wp-content/uploads/2007/07/AS-OSSELMANN2025.jpg',
+  hoelle: 'https://ride-index.de/wp-content/uploads/2005/01/FAHRTZURHOELLE_Fellerhoff2026.jpg',
+  musikexpress: 'https://ride-index.de/wp-content/uploads/2005/01/MUSIK-EXPRESS-Krause2026.jpg',
+  crazydancer: 'https://ride-index.de/wp-content/uploads/2005/01/CRAZYDANCER_Freiwald2025.jpg',
+  hypnotizer: 'https://ride-index.de/wp-content/uploads/2026/04/Thelen-Hypnotizer-Fahrt-2026-L2.jpg',
+  pocoloco: 'https://ride-index.de/wp-content/uploads/2026/03/POCOLOCO_SchultzebyMPasslack2026.jpg',
+  kids: null
+};
+RIDES.forEach(r=>{ if(RIDE_IMGS[r.id]) r.img = RIDE_IMGS[r.id]; });
+
+const ICONS = {
+  ferriswheel: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.6"/><path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3L6.3 17.7"/>`,
+  swing: `<path d="M4 4v6M20 4v6"/><path d="M4 10h16"/><path d="M8 10l3 9M16 10l-3 9"/><circle cx="9" cy="20" r="1.4"/><circle cx="15" cy="20" r="1.4"/>`,
+  splash: `<path d="M12 3s5 6 5 10a5 5 0 0 1-10 0c0-4 5-10 5-10Z"/><path d="M3 20c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/>`,
+  tent: `<path d="M12 3l8 16H4L12 3Z"/><path d="M12 3v16M7 19l5-9 5 9"/>`,
+  tower: `<path d="M9 21V9l3-6 3 6v12"/><path d="M6 21h12"/><path d="M9 13h6M9 9h6"/>`,
+  bounce: `<path d="M4 16c2-6 4-6 4 0s2 6 4 0 2-6 4 0 2 6 4 0"/><path d="M4 20h16"/>`,
+  spin: `<path d="M12 3a9 9 0 1 0 9 9"/><path d="M17 3v6h-6"/>`,
+  dancer: `<circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 6M12 13l4 6M12 9l-5 2M12 9l5 2"/>`,
+  ghost: `<path d="M6 20V11a6 6 0 0 1 12 0v9l-2.5-2-2 2-1.5-1.5-1.5 1.5-2-2L6 20Z"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/>`,
+  funhouse: `<path d="M4 21V10l4-3 4 3 4-3 4 3v11"/><path d="M4 21h16"/><path d="M9 21v-5h6v5"/>`,
+  bumpercar: `<rect x="4" y="11" width="16" height="7" rx="3"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/><path d="M12 11V7"/><circle cx="12" cy="5.5" r="1.5"/>`,
+  musicnote: `<path d="M9 18V5l10-2v13"/><circle cx="7" cy="18" r="2.2"/><circle cx="17" cy="16" r="2.2"/>`,
+  pendulum: `<path d="M12 3v4"/><path d="M4 7h16"/><path d="M6 7l6 12 6-12"/><circle cx="12" cy="19" r="1.6"/>`,
+  carousel: `<path d="M12 3v4"/><path d="M6 10l6-3 6 3"/><path d="M4 21l2-9h12l2 9"/><path d="M9 21v-5M15 21v-5M12 21v-6"/>`,
+};
+function iconSvg(key){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[key]||ICONS.spin}</svg>`; }
+function colorGroup(cat){ return cat==='kids' ? 'kids' : 'ride'; }
+
+/* ===================== MAP ===================== */
+const map = L.map('map', {zoomControl:false}).setView([51.1931, 7.0113], 16);
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>-Mitwirkende'
+}).addTo(map);
+
+function makeDivIcon(r){
+  const grp = colorGroup(r.cat);
+  /* Standorte NICHT verändert – TBA nur optisch als grau/ungefähr markiert */
+  const tbaCls = r.tba ? ' tba-pin' : '';
+  const title = r.tba ? (r.name + ' (Standort noch TBA)') : r.name;
+  return L.divIcon({
+    className:'div-pin', iconSize:[34,34], iconAnchor:[17,34], popupAnchor:[0,-30],
+    html:`<div class="pin ${grp}${tbaCls}" title="${title}"><div class="pin-icon">${iconSvg(r.icon)}</div>${r.isNew?'<span class="new-dot"></span>':''}</div>`
+  });
+}
+
+const markers = {};
+RIDES.forEach(r=>{
+  const m = L.marker([r.lat, r.lng], {icon:makeDivIcon(r), title:r.name});
+  m.on('click', ()=>openDetail(r.id));
+  m.addTo(map);
+  markers[r.id] = m;
+});
+
+
+/* ===================== LIST / SEARCH ===================== */
+const listEl = document.getElementById('list');
+const resultCountEl = document.getElementById('resultCount');
+let searchTerm='', selectedId=null, activeCat='all';
+function matches(r){
+  if(activeCat!=='all' && r.cat!==activeCat) return false;
+  if(!searchTerm) return true;
+  return (r.name+' '+r.subtitle+' '+r.location+' '+r.operator).toLowerCase().includes(searchTerm);
+}
+function syncMarkerVisibility(){
+  RIDES.forEach(r=>{
+    const m=markers[r.id];
+    if(!m) return;
+    const show = activeCat==='all' || r.cat===activeCat;
+    if(show){ if(!map.hasLayer(m)) m.addTo(map); }
+    else { if(map.hasLayer(m)) map.removeLayer(m); }
+  });
+}
+document.getElementById('chipRow').addEventListener('click', e=>{
+  const b=e.target.closest('.chip');
+  if(!b) return;
+  activeCat=b.dataset.cat;
+  document.querySelectorAll('#chipRow .chip').forEach(c=>c.classList.toggle('on', c===b));
+  syncMarkerVisibility();
+  renderList();
+});
+function renderList(){
+  listEl.innerHTML='';
+  const shown = RIDES.filter(matches);
+  resultCountEl.textContent = searchTerm ? `${shown.length} von ${RIDES.length} Ergebnissen` : `${RIDES.length} Fahrgeschäfte`;
+  shown.forEach(r=>{
+    const div=document.createElement('div');
+    div.className=`ride-card`+(r.id===selectedId?' active':'');
+    const thumb = r.img
+      ? `<div style="position:relative;width:52px;height:52px;flex:none;"><div class="ride-thumb-fallback ${colorGroup(r.cat)}" style="position:absolute;inset:0;">${iconSvg(r.icon)}</div><img class="ride-thumb" src="${r.img}" alt="" loading="lazy" referrerpolicy="no-referrer" style="position:absolute;inset:0;" onerror="this.remove()"></div>`
+      : `<div class="ride-thumb-fallback ${colorGroup(r.cat)}">${iconSvg(r.icon)}${r.isNew?'<span class="new-dot"></span>':''}</div>`;
+    div.innerHTML=`
+      <div style="position:relative;flex:none;">${thumb}</div>
+      <div class="ride-meta">
+        <div class="name">${r.name} ${r.tba?'<span class="badge" style="background:#f1f3f4;color:var(--muted);">TBA</span>':''}</div>
+        <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12A7 7 0 0 0 5 10c0 4.6 7 12 7 12Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+        <span class="${r.tba?'tba':''}">${r.location}</span></div>
+      </div>`;
+    div.addEventListener('click', ()=>{ openDetail(r.id); map.panTo([r.lat,r.lng]); });
+    listEl.appendChild(div);
+  });
+}
+document.getElementById('searchInput').addEventListener('input', e=>{
+  searchTerm=e.target.value.trim().toLowerCase();
+  renderList();
+});
+
+/* ===================== DETAIL PANEL ===================== */
+const detail=document.getElementById('detail'), backdrop=document.getElementById('backdrop'), detailBody=document.getElementById('detailBody');
+function catLabel(cat){ return cat==='kids' ? 'Kinder-Fahrgeschäft' : 'Fahrgeschäft'; }
+let userPos=null;
+function routeUrls(r){
+  /* Ziele sind immer die exakt eingemessenen Koordinaten (nicht Adress-Suche) */
+  const gUrl = `https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}&travelmode=walking`+(userPos?`&origin=${userPos.lat},${userPos.lng}`:'');
+  const aUrl = `https://maps.apple.com/?daddr=${r.lat},${r.lng}&dirflg=w`+(userPos?`&saddr=${userPos.lat},${userPos.lng}`:'');
+  return {gUrl,aUrl};
+}
+function openDetail(id){
+  const r = RIDES.find(x=>x.id===id);
+  if(!r) return;
+  selectedId=id; renderList();
+  const {gUrl,aUrl} = routeUrls(r);
+  const grp = colorGroup(r.cat);
+  const hero = r.img
+    ? `<div class="detail-hero" style="position:relative;">${r.isNew?'<span class="ribbon">NEUHEIT 2026</span>':''}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:${grp==='kids'?'var(--blue)':'var(--amber-dark)'}">${iconSvg(r.icon)}</div><img src="${r.img}" alt="${r.name}" referrerpolicy="no-referrer" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>
+       <div class="photo-credit">Foto: <a href="${r.rideIndexUrl}" target="_blank" rel="noopener">ride-index.de</a> – antippen für groß / mehr Bilder ↗</div>`
+    : `<div class="detail-hero icon-only" style="color:${grp==='kids'?'var(--blue)':'var(--amber-dark)'}">
+      ${r.isNew?'<span class="ribbon">NEUHEIT 2026</span>':''}
+      ${iconSvg(r.icon)}
+    </div>`;
+  detailBody.innerHTML = `
+    ${hero}
+    <h2 style="margin-top:12px;">${r.name}</h2>
+    <div class="subtitle">${r.subtitle}</div>
+    <div class="badge-row">
+      <span class="badge ${grp}">${catLabel(r.cat)}</span>
+      ${r.isNew?'<span class="badge new">✨ Neu 2026</span>':''}
+      ${r.tba?'<span class="badge" style="background:#f1f3f4;color:var(--muted);">📍 Standort TBA – ungefähre Lage</span>':''}
+    </div>
+    <div id="navDistRow" style="font-size:13px;color:var(--muted);margin:4px 0 0;"></div>
+    <div class="meta-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12A7 7 0 0 0 5 10c0 4.6 7 12 7 12Z"/><circle cx="12" cy="10" r="2.4"/></svg><div class="k">Standort</div><div class="${r.tba?'tba':''}">${r.location}</div></div>
+    <div class="meta-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="k">Betreiber</div><div>${r.operator}</div></div>
+    <p class="desc">${r.desc}</p>
+    <div class="actions">
+      <button class="btn primary" id="inAppNavBtn">🧭 In dieser App hinführen</button>
+      <button class="btn" id="shareBtn">🔗 Link zu diesem Fahrgeschäft kopieren</button>
+      <a class="btn primary" style="background:#0b5f0b;" href="${gUrl}" target="_blank" rel="noopener">Route via Google Maps</a>
+      <a class="btn" href="${aUrl}" target="_blank" rel="noopener">Route via Apple Maps</a>
+      <a class="btn" href="${r.url}" target="_blank" rel="noopener">Zur offiziellen Fahrgeschäft-Seite</a>
+      ${r.img?`<a class="btn" href="${r.img}" target="_blank" rel="noopener">📷 Foto groß ansehen (ride-index.de)</a>`:''}
+      <a class="btn" href="${r.rideIndexUrl}" target="_blank" rel="noopener">📖 Ride-Index (Fahrgeschäfte-Wiki) ↗</a>
+    </div>
+    ${r.tba?'<div class="note">Der genaue Standplatz für dieses Fahrgeschäft war zum Zeitpunkt der letzten Aktualisierung noch nicht veröffentlicht. Der Pin zeigt nur eine ungefähre Lage – er wurde <b>nicht</b> verschoben, alle anderen Pins sind unverändert.</div>':''}
+    <div class="note">Fotos: ride-index.de – alle Bildrechte bei den Fotografen dort. Falls ein Bild nicht lädt, über „Ride-Index“ öffnen.</div>
+  `;
+  detail.classList.add('show'); backdrop.classList.add('show');
+  try{ history.replaceState(null,'','#'+r.id); }catch(e){}
+  document.getElementById('inAppNavBtn').addEventListener('click', ()=>startNavigation(r.id));
+  document.getElementById('shareBtn').addEventListener('click', async ()=>{
+    const link=location.href.split('#')[0]+'#'+r.id;
+    try{ await navigator.clipboard.writeText(link); showToast('Link kopiert – teilen per WhatsApp & Co. 📲', 3000); }
+    catch(e){ prompt('Link kopieren:', link); }
+  });
+  updateNavDistRow(r);
+}
+function closeDetail(){
+  detail.classList.remove('show'); backdrop.classList.remove('show'); selectedId=null; renderList();
+  try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+}
+document.getElementById('detailClose').addEventListener('click', closeDetail);
+backdrop.addEventListener('click', closeDetail);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
+
+/* ===================== GEOLOCATION + IN-APP NAVIGATION ===================== */
+const geoStatus=document.getElementById('geoStatus');
+const locateBtn=document.getElementById('locateBtn');
+const locateLabel=document.getElementById('locateLabel');
+const headerLocBtn=document.getElementById('headerLocBtn');
+const headerLocLabel=document.getElementById('headerLocLabel');
+const locBanner=document.getElementById('locBanner');
+const bannerLocBtn=document.getElementById('bannerLocBtn');
+const navBar=document.getElementById('navBar');
+const navArrow=document.getElementById('navArrow');
+const navTitle=document.getElementById('navTitle');
+const navSub=document.getElementById('navSub');
+const navProg=document.getElementById('navProg');
+document.getElementById('navStop').addEventListener('click', stopNavigation);
+let youMarker=null, watchId=null, navTargetId=null, navLine=null, headingDeg=null;
+
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371000, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+function bearing(lat1,lng1,lat2,lng2){
+  const toRad=d=>d*Math.PI/180, toDeg=d=>d*180/Math.PI;
+  const dLng=toRad(lng2-lng1);
+  const y=Math.sin(dLng)*Math.cos(toRad(lat2));
+  const x=Math.cos(toRad(lat1))*Math.sin(toRad(lat2))-Math.sin(toRad(lat1))*Math.cos(toRad(lat2))*Math.cos(dLng);
+  return (toDeg(Math.atan2(y,x))+360)%360;
+}
+function fmtDist(m){
+  if(m<1000) return Math.round(m)+' m';
+  return (m/1000).toFixed(1).replace('.',',')+' km';
+}
+function fmtTime(m){ const min=Math.max(1,Math.round(m/80)); return min+' Min. zu Fuß'; }
+
+function setLocUI(active){
+  headerLocLabel.textContent = active ? 'Standort aktiv' : 'Standort aktivieren';
+  headerLocBtn.classList.toggle('active', !!active);
+  if(active) locBanner.classList.add('hidden');
+}
+function updateYouMarker(){
+  if(!userPos) return;
+  if(youMarker) map.removeLayer(youMarker);
+  const icon = L.divIcon({className:'div-pin', iconSize:[18,18], iconAnchor:[9,9],
+    html:'<div style="position:relative"><div class="you-pulse"></div><div class="you-dot"></div></div>'});
+  youMarker = L.marker([userPos.lat,userPos.lng], {icon, zIndexOffset:1000}).addTo(map);
+}
+function onPosUpdate(pos, firstFix){
+  userPos={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy};
+  headingDeg = (pos.coords.heading!=null && !isNaN(pos.coords.heading)) ? pos.coords.heading : headingDeg;
+  updateYouMarker();
+  setLocUI(true);
+  const distC = haversine(userPos.lat,userPos.lng, 51.1934, 7.0129);
+  if(!navTargetId){
+    geoStatus.innerHTML = `<b>Standort aktiv.</b> ~${Math.round(distC)} m vom Neuen Markt entfernt. Navigation: Fahrgeschäft wählen → „In dieser App hinführen".`;
+    geoStatus.classList.add('show');
+  }
+  if(firstFix) map.setView([userPos.lat,userPos.lng], Math.max(map.getZoom(), 16));
+  if(navTargetId) updateNavUI();
+  const r = selectedId && RIDES.find(x=>x.id===selectedId);
+  if(r) updateNavDistRow(r);
+}
+function onPosError(err){
+  locateBtn.classList.remove('spinning');
+  const isSecure = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost' || location.protocol==='file:';
+  let msg='Standort konnte nicht ermittelt werden.';
+  if(err.code===1) msg='Standortzugriff verweigert. iPhone: Einstellungen → Datenschutz → Ortungsdienste an. Browser: Schloss-Symbol / aA → Website-Einstellungen → Standort erlauben, dann erneut tippen.';
+  else if(err.code===2 && !isSecure) msg='Standort braucht https oder localhost. Datei bitte über einen lokalen Server öffnen oder auf https hosten.';
+  else if(err.code===3) msg='Zeitüberschreitung – bitte erneut versuchen (freier Himmel hilft).';
+  geoStatus.innerHTML=`<b>${msg}</b>`;
+  geoStatus.classList.add('show');
+  showToast(msg, 4500);
+}
+function requestLocation(opts={}){
+  if(!navigator.geolocation){
+    geoStatus.innerHTML='<b>Dieser Browser unterstützt keine Standortabfrage.</b>';
+    geoStatus.classList.add('show');
+    return;
+  }
+  locateBtn.classList.add('spinning');
+  geoStatus.innerHTML='<b>Suche deinen Standort …</b> Bitte Anfrage erlauben.';
+  geoStatus.classList.add('show');
+  if(watchId!=null) navigator.geolocation.clearWatch(watchId);
+  watchId = navigator.geolocation.watchPosition(
+    pos=>{ locateBtn.classList.remove('spinning'); onPosUpdate(pos, !!opts.center || !userPos); },
+    onPosError,
+    {enableHighAccuracy:true, timeout:15000, maximumAge:5000}
+  );
+  // Fallback: einmaliger Fix, falls watch hängt
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ locateBtn.classList.remove('spinning'); onPosUpdate(pos, !!opts.center); },
+    ()=>{}, {enableHighAccuracy:true, timeout:15000, maximumAge:10000}
+  );
+}
+locateBtn.addEventListener('click', ()=>requestLocation({center:true}));
+locateLabel.addEventListener('click', ()=>requestLocation({center:true}));
+headerLocBtn.addEventListener('click', ()=>requestLocation({center:true}));
+bannerLocBtn.addEventListener('click', ()=>requestLocation({center:true}));
+
+/* ---- In-App-Führung: echte Wege (OSRM) + Sprachausgabe ---- */
+let voiceOn = true;
+let lastRouteFetch = 0, lastRoutePos = null, routeData = null, lastStepKey = '', lastSpeakDist = 0, arrivedSpoken = false;
+const navNext = document.getElementById('navNext');
+const navMute = document.getElementById('navMute');
+navMute.addEventListener('click', ()=>{
+  voiceOn = !voiceOn;
+  navMute.textContent = voiceOn ? '🔊' : '🔇';
+  if(!voiceOn && 'speechSynthesis' in window) speechSynthesis.cancel();
+  else if(voiceOn && navTargetId) speak('Sprachansage an.');
+});
+function speak(text){
+  if(!voiceOn || !('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'de-DE'; u.rate = 1.0;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function maneuverText(step){
+  if(!step || !step.maneuver) return '';
+  const m = step.maneuver, mod = (m.modifier||'').toLowerCase(), type = (m.type||'').toLowerCase();
+  const name = step.name ? ` auf ${step.name}` : '';
+  const dist = step.distance!=null ? ` in ${Math.max(5,Math.round(step.distance))} Metern` : '';
+  if(type==='arrive') return 'Ziel erreicht.';
+  if(type==='depart') return `Los geht's${name}.`;
+  if(mod.includes('left')) return `Links abbiegen${name}${dist}.`;
+  if(mod.includes('right')) return `Rechts abbiegen${name}${dist}.`;
+  if(mod.includes('straight') || type==='continue') return `Geradeaus${name}${dist}.`;
+  if(type.includes('roundabout') || type.includes('rotary')) return `Im Kreisverkehr abfahren${name}${dist}.`;
+  if(mod.includes('u-turn')) return `Wenden${dist}.`;
+  return `${step.name||'Weiter'}${dist}.`;
+}
+function updateNavDistRow(r){
+  const el=document.getElementById('navDistRow');
+  if(!el) return;
+  if(userPos) el.textContent = `📍 ${fmtDist(haversine(userPos.lat,userPos.lng,r.lat,r.lng))} von dir · echte Route & Sprache in der Navigation`;
+  else el.textContent = '📍 Tippe „Standort aktivieren“, dann siehst du hier live die Entfernung.';
+}
+function startNavigation(id){
+  const r = RIDES.find(x=>x.id===id);
+  if(!r) return;
+  navTargetId=id; routeData=null; lastStepKey=''; arrivedSpoken=false; lastSpeakDist=0; lastRouteFetch=0; lastRoutePos=null;
+  closeDetail();
+  document.getElementById('legendBox').style.display='none';
+  locBanner.classList.add('hidden');
+  navBar.classList.add('show');
+  navNext.style.display='none';
+  if(navLine) map.removeLayer(navLine);
+  if(!userPos){
+    requestLocation({center:false});
+    navTitle.textContent = r.name;
+    navSub.textContent = 'Warte auf Standort … bitte erlauben';
+    showToast('Standort erlauben – dann führt dich die App zum Ziel.', 3500);
+  } else {
+    speak(`Navigation zu ${r.name} gestartet. Echte Route wird geladen.`);
+  }
+  updateNavUI(true);
+  showToast('Echte Fußroute + 🔊 Ansage. Folge der blauen Linie.', 3000);
+}
+async function fetchRoute(force){
+  const r = RIDES.find(x=>x.id===navTargetId);
+  if(!r || !userPos) return;
+  const now = Date.now();
+  if(!force && lastRoutePos && haversine(userPos.lat,userPos.lng,lastRoutePos.lat,lastRoutePos.lng) < 25 && now - lastRouteFetch < 15000) return;
+  lastRouteFetch = now;
+  lastRoutePos = {lat:userPos.lat, lng:userPos.lng};
+  navSub.textContent = routeData ? navSub.textContent : 'Route wird berechnet …';
+  try{
+    const c = `${userPos.lng},${userPos.lat};${r.lng},${r.lat}`;
+    const urls = [
+      `https://routing.openstreetmap.de/routed-foot/route/v1/driving/${c}?overview=full&geometries=geojson&steps=true`,
+      `https://router.project-osrm.org/route/v1/driving/${c}?overview=full&geometries=geojson&steps=true`
+    ];
+    let j = null;
+    for(const url of urls){
+      try{
+        const res = await fetch(url);
+        j = await res.json();
+        if(j.code==='Ok' && j.routes && j.routes[0]) break;
+        j = null;
+      }catch(e){ j = null; }
+    }
+    if(j && j.routes && j.routes[0]){
+      routeData = j.routes[0];
+      drawRoute();
+    } else { drawFallback(r); }
+  }catch(e){ drawFallback(r); }
+}
+function drawRoute(){
+  const r = RIDES.find(x=>x.id===navTargetId);
+  if(!r || !routeData) return;
+  if(navLine) map.removeLayer(navLine);
+  const latlngs = routeData.geometry.coordinates.map(c=>[c[1],c[0]]);
+  navLine = L.polyline(latlngs, {color:'#1a73e8', weight:5, opacity:.9}).addTo(map);
+  const dist = routeData.distance, dur = routeData.duration;
+  const mins = Math.max(1, Math.round(dur/60));
+  navTitle.textContent = r.name;
+  navSub.textContent = `${fmtDist(dist)} · ${mins} Min. zu Fuß (echte Route)`;
+  navProg.style.width = Math.min(100, Math.max(2, 100 - (dist/800)*100))+'%';
+  // nächster Abbiegehinweis
+  const leg = routeData.legs && routeData.legs[0], steps = leg ? leg.steps : [];
+  let next = steps.find(s=>s.distance > 8) || steps[0];
+  if(next){
+    const txt = maneuverText(next);
+    navNext.textContent = '➡️ ' + txt;
+    navNext.style.display = 'block';
+    const key = (next.maneuver||{}).instruction || txt;
+    if(key !== lastStepKey){ lastStepKey = key; speak(txt); lastSpeakDist = dist; }
+    else if(Math.abs(dist - lastSpeakDist) > 150){ lastSpeakDist = dist; speak(`Noch ${fmtDist(dist)} bis ${r.name}. ${txt}`); }
+  }
+  if(dist < 20){
+    navSub.textContent = '🎉 Ziel erreicht – viel Spaß!';
+    navProg.style.width='100%';
+    navNext.style.display='none';
+    if(!arrivedSpoken){ arrivedSpoken=true; speak(`Ziel ${r.name} erreicht. Viel Spaß auf der Kirmes!`); }
+    return;
+  }
+  try{ map.fitBounds(navLine.getBounds().pad(0.3), {animate:true}); }catch(e){}
+}
+function drawFallback(r){
+  if(navLine) map.removeLayer(navLine);
+  navLine = L.polyline([[userPos.lat,userPos.lng],[r.lat,r.lng]], {color:'#1a73e8', weight:4, opacity:.7, dashArray:'8 8'}).addTo(map);
+  const d = haversine(userPos.lat,userPos.lng,r.lat,r.lng);
+  navTitle.textContent = r.name;
+  navSub.textContent = `${fmtDist(d)} · ${fmtTime(d)} (Luftlinie – offline)`;
+  navNext.style.display='none';
+  try{ map.fitBounds(navLine.getBounds().pad(0.35), {animate:true}); }catch(e){}
+}
+function updateNavUI(force){
+  const r = RIDES.find(x=>x.id===navTargetId);
+  if(!r || !userPos){
+    if(r){ navTitle.textContent=r.name; navSub.textContent='Warte auf GPS …'; }
+    return;
+  }
+  const b = bearing(userPos.lat,userPos.lng,r.lat,r.lng);
+  const rot = headingDeg!=null ? (b - headingDeg + 360)%360 : b;
+  navArrow.style.transform = `rotate(${(rot-90+360)%360}deg)`;
+  fetchRoute(force);
+  // Pfeil sofort auf Luftlinien-Peilung, Route kommt async
+  if(!routeData){
+    const d = haversine(userPos.lat,userPos.lng,r.lat,r.lng);
+    navTitle.textContent = r.name;
+    navSub.textContent = `${fmtDist(d)} · Route lädt …`;
+  }
+}
+function stopNavigation(){
+  navTargetId=null; routeData=null;
+  navBar.classList.remove('show');
+  navNext.style.display='none';
+  document.getElementById('legendBox').style.display='';
+  if(navLine){ map.removeLayer(navLine); navLine=null; }
+  if('speechSynthesis' in window) try{ speechSynthesis.cancel(); }catch(e){}
+}
+
+/* ===================== TOAST ===================== */
+const toastEl=document.getElementById('toast'); let toastTimer=null;
+function showToast(msg, ms=3000){
+  toastEl.textContent=msg; toastEl.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>toastEl.classList.remove('show'), ms);
+}
+
+/* ===================== MOBILE SHEET ===================== */
+const sidebar=document.getElementById('sidebar'), dragHandle=document.getElementById('dragHandle');
+dragHandle.addEventListener('click', ()=>sidebar.classList.toggle('expanded'));
+let touchStartY=null;
+dragHandle.addEventListener('touchstart', e=>{ touchStartY=e.touches[0].clientY; });
+dragHandle.addEventListener('touchend', e=>{
+  if(touchStartY===null) return;
+  const dy=e.changedTouches[0].clientY-touchStartY;
+  if(dy<-20) sidebar.classList.add('expanded');
+  if(dy>20) sidebar.classList.remove('expanded');
+  touchStartY=null;
+});
+
+/* ===================== ÖFFNUNGSZEITEN 2026 (offiziell: haaner-kirmes.de) ===================== */
+const HOURS_2026 = [
+  {start:new Date(2026,8,25,16,0), end:new Date(2026,8,26,0,0),  label:'Fr 25.09.', open:'16–24 Uhr'},
+  {start:new Date(2026,8,26,14,0), end:new Date(2026,8,27,1,0),  label:'Sa 26.09.', open:'14–1 Uhr'},
+  {start:new Date(2026,8,27,11,0), end:new Date(2026,8,27,23,0), label:'So 27.09.', open:'11–23 Uhr'},
+  {start:new Date(2026,8,28,10,0), end:new Date(2026,8,28,23,0), label:'Mo 28.09.', open:'10–23 Uhr'},
+  {start:new Date(2026,8,29,14,0), end:new Date(2026,8,29,23,0), label:'Di 29.09.', open:'14–23 Uhr 🎆 Feuerwerk'},
+];
+const HOURS_SHORT = 'Fr 16–24 · Sa 14–1 · So 11–23 · Mo 10–23 · Di 14–23 Uhr';
+function openStatus(now){
+  now = now || new Date();
+  for(const h of HOURS_2026){
+    if(now>=h.start && now<h.end) return {cls:'open', html:`🟢 Jetzt geöffnet <small>Heute (${h.label}): ${h.open}</small>`};
+  }
+  for(const h of HOURS_2026){
+    if(now<h.start){
+      const days=Math.ceil((h.start-now)/864e5);
+      const when = days<=1 ? `${h.label} ab ${h.open.split('–')[0]} Uhr` : `${h.label} ${h.open} Uhr`;
+      const first = now < HOURS_2026[0].start;
+      return {cls:'soon', html:`${first?'⏳ Eröffnung Fr 25.09., 16 Uhr am Riesenrad':'🔴 Gerade geschlossen – weiter '+when}<small>${HOURS_SHORT}</small>`};
+    }
+  }
+  return {cls:'shut', html:`🎡 Kirmes 2026 ist vorbei – danke für deinen Besuch!<small>${HOURS_SHORT}</small>`};
+}
+function refreshOpenStatus(){
+  const el=document.getElementById('openStatus');
+  if(!el) return;
+  const s=openStatus();
+  el.className='open-status '+s.cls;
+  el.innerHTML=s.html;
+  el.title='Öffnungszeiten 2026: '+HOURS_2026.map(h=>`${h.label} ${h.open}`).join(' · ');
+}
+setInterval(refreshOpenStatus, 60000);
+
+/* ===================== WELCOME + VISITOR COUNTER ===================== */
+(function(){
+  const modal=document.getElementById('welcomeModal');
+  const hideBox=document.getElementById('welcomeHide');
+  // Echter Zähler: counter11.optistats.ovh zählt beim Laden des Embeds oben.
+  let hide=false;
+  try{ hide=localStorage.getItem('hk2026_hide_welcome')==='1'; }catch(e){}
+  if(!hide) modal.classList.add('show');
+  document.getElementById('welcomeOk').addEventListener('click', ()=>{
+    try{ if(hideBox.checked) localStorage.setItem('hk2026_hide_welcome','1'); }catch(e){}
+    modal.classList.remove('show');
+  });
+  document.getElementById('openWelcome').addEventListener('click', e=>{
+    e.preventDefault(); modal.classList.add('show');
+  });
+  const pModal=document.getElementById('privacyModal');
+  document.getElementById('privacyOk').addEventListener('click', ()=>pModal.classList.remove('show'));
+  pModal.addEventListener('click', e=>{ if(e.target===pModal) pModal.classList.remove('show'); });
+  document.getElementById('openPrivacy').addEventListener('click', e=>{
+    e.preventDefault(); pModal.classList.add('show');
+  });
+  document.getElementById('openPrivacy2').addEventListener('click', e=>{
+    e.preventDefault(); pModal.classList.add('show');
+  });
+})();
+
+/* ===================== PROGRAMM 2026 ===================== */
+const EVENTS_2026 = [
+  {day:'FR 25.9.', time:'16:00', title:'Eröffnung am Riesenrad', sub:'Fassanstich, Freibier & Böller mit Bürgermeister Vincent Endereß und Dixie Band'},
+  {day:'SA 26.9.', time:'tagsüber', title:'Stars für Kids', sub:'Beliebte Comicfiguren wandeln über das Gelände'},
+  {day:'SO 27.9.', time:'nachmittags', title:'Senioren-Kaffeetrinken', sub:'Kaffee & Kuchen für Senioren'},
+  {day:'MO 28.9.', time:'morgens', title:'Autoscooter-Gottesdienst', sub:'Traditioneller Kirmes-Gottesdienst im Autoscooter'},
+  {day:'DI 29.9.', time:'abends', title:'Abschluss-Feuerwerk 🎆', sub:'Fulminantes Finale zum Kirmes-Ausklang'},
+];
+document.getElementById('progList').innerHTML = EVENTS_2026.map(e=>
+  `<div class="event"><div class="day">${e.day}<br>${e.time}</div><div><b>${e.title}</b><span>${e.sub}</span></div></div>`
+).join('');
+const progModal=document.getElementById('progModal');
+document.getElementById('progBtn').addEventListener('click', ()=>progModal.classList.add('show'));
+document.getElementById('progOk').addEventListener('click', ()=>progModal.classList.remove('show'));
+progModal.addEventListener('click', e=>{ if(e.target===progModal) progModal.classList.remove('show'); });
+
+/* ===================== INSTALL-HILFE ===================== */
+const installModal=document.getElementById('installModal');
+document.getElementById('openInstall').addEventListener('click', e=>{
+  e.preventDefault(); installModal.classList.add('show');
+});
+document.getElementById('installOk').addEventListener('click', ()=>installModal.classList.remove('show'));
+installModal.addEventListener('click', e=>{ if(e.target===installModal) installModal.classList.remove('show'); });
+
+/* ===================== INIT ===================== */
+renderList();
+refreshOpenStatus();
+/* Deep-Link: #fahrgeschaeft-id öffnet direkt das Detail */
+(function(){
+  const id=(location.hash||'').replace('#','');
+  if(id && RIDES.some(r=>r.id===id)){
+    const r=RIDES.find(x=>x.id===id);
+    map.setView([r.lat,r.lng], 17);
+    openDetail(id);
+  }
+})();
+</script>
+</body>
+</html>
