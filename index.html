@@ -72,6 +72,13 @@
     font-size:14.5px;font-family:inherit;color:var(--ink);outline:none;
   }
   .search input::placeholder{color:var(--muted);}
+  .search-clear{position:absolute;right:8px;width:30px;height:30px;border-radius:50%;border:none;background:transparent;
+    color:var(--muted);font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;font-family:inherit;}
+  .search-clear:hover{background:rgba(0,0,0,.07);}
+  .search.has-text .search-clear{display:flex;}
+  .search.has-text input{padding-right:42px;}
+  /* Bottom-Sheet-Griff: nur mobil sichtbar */
+  .sheet-grabber{display:none;}
 
   .result-count{padding:0 20px 8px;font-size:12.5px;color:var(--muted);}
   .open-status{margin:0 12px 8px;padding:9px 13px;border-radius:12px;font-size:12.5px;font-weight:700;
@@ -266,19 +273,26 @@
   ::-webkit-scrollbar-thumb{background:var(--card-edge);border-radius:99px;}
 
   @media (max-width: 860px){
-    aside{position:fixed;left:0;right:0;bottom:0;top:auto;height:62vh;width:auto;border-right:none;border-top:1px solid var(--card-edge);
-      border-radius:16px 16px 0 0;z-index:950;transform:translateY(calc(100% - 112px));transition:transform .25s;box-shadow:0 -4px 20px rgba(0,0,0,.18);}
+    aside{position:fixed;left:0;right:0;bottom:0;top:auto;height:88vh;width:auto;border-right:none;border-top:1px solid var(--card-edge);
+      border-radius:16px 16px 0 0;z-index:950;transform:translateY(calc(100% - 128px));transition:transform .25s;box-shadow:0 -4px 20px rgba(0,0,0,.18);}
     aside.expanded{transform:translateY(0);}
-    .drag-handle{width:38px;height:5px;border-radius:99px;background:var(--card-edge);margin:9px auto 2px;}
+    /* Großer, buttonartiger Griff mit Pfeil */
+    .sheet-grabber{display:flex;width:100%;padding:10px 0 4px;background:transparent;border:none;cursor:pointer;
+      font-family:inherit;align-items:center;justify-content:center;touch-action:pan-x pan-y;}
+    .grabber-pill{display:inline-flex;align-items:center;gap:8px;background:var(--bg-2);border-radius:999px;
+      padding:8px 18px;font-size:13px;font-weight:800;color:var(--ink);box-shadow:var(--shadow-sm);white-space:nowrap;}
+    .sheet-grabber:active .grabber-pill{background:#e8eaed;}
+    .grabber-arrow{display:inline-block;font-size:12px;color:var(--blue);transition:transform .25s;}
+    aside.expanded .grabber-arrow{transform:rotate(180deg);}
     header p{display:none;}
     .detail{width:100vw;}
     /* FABs über die eingeklappte Leiste legen, sonst verdeckt */
-    .map-fabs{bottom:126px;}
+    .map-fabs{bottom:142px;}
     .chip-row{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px;}
     .chip{flex:none;}
     .open-status{margin:0 12px 8px;}
     .prog-btn{margin:0 12px 8px;}
-    .geo-status{left:12px;right:12px;bottom:186px;max-width:none;}
+    .geo-status{left:12px;right:12px;bottom:202px;max-width:none;}
     .loc-banner{right:12px;top:64px;}
     .loc-btn span{display:none;}
     .loc-btn{padding:9px 11px;}
@@ -307,11 +321,14 @@
 
   <main>
     <aside id="sidebar">
-      <div class="drag-handle" id="dragHandle"></div>
+      <button class="sheet-grabber" id="dragHandle" aria-expanded="false" aria-controls="sidebar" aria-label="Liste ein-/ausklappen">
+        <span class="grabber-pill"><span class="grabber-arrow">▲</span><span id="grabberLabel">Fahrgeschäfte</span></span>
+      </button>
       <div class="search-wrap">
-        <div class="search">
+        <div class="search" id="searchBox">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input id="searchInput" type="text" placeholder="Fahrgeschäft suchen …" autocomplete="off">
+          <button class="search-clear" id="searchClear" aria-label="Suche löschen">✕</button>
         </div>
       </div>
       <div class="result-count" id="resultCount"></div>
@@ -529,6 +546,8 @@ function renderList(){
   listEl.innerHTML='';
   const shown = RIDES.filter(matches);
   resultCountEl.textContent = searchTerm ? `${shown.length} von ${RIDES.length} Ergebnissen` : `${RIDES.length} Fahrgeschäfte`;
+  const grabberLabel=document.getElementById('grabberLabel');
+  if(grabberLabel) grabberLabel.textContent = searchTerm ? `${shown.length} Treffer – Liste ansehen` : `${RIDES.length} Fahrgeschäfte – Liste ansehen`;
   shown.forEach(r=>{
     const div=document.createElement('div');
     div.className=`ride-card`+(r.id===selectedId?' active':'');
@@ -546,9 +565,22 @@ function renderList(){
     listEl.appendChild(div);
   });
 }
-document.getElementById('searchInput').addEventListener('input', e=>{
+const searchInput=document.getElementById('searchInput');
+const searchBox=document.getElementById('searchBox');
+const searchClear=document.getElementById('searchClear');
+searchInput.addEventListener('input', e=>{
   searchTerm=e.target.value.trim().toLowerCase();
+  searchBox.classList.toggle('has-text', searchTerm.length>0);
   renderList();
+});
+/* Bei Suche automatisch ausklappen, damit Treffer sichtbar sind */
+searchInput.addEventListener('focus', ()=>setSheet(true));
+searchClear.addEventListener('click', ()=>{
+  searchInput.value='';
+  searchTerm='';
+  searchBox.classList.remove('has-text');
+  renderList();
+  searchInput.focus();
 });
 
 /* ===================== DETAIL PANEL ===================== */
@@ -879,15 +911,24 @@ function showToast(msg, ms=3000){
 
 /* ===================== MOBILE SHEET ===================== */
 const sidebar=document.getElementById('sidebar'), dragHandle=document.getElementById('dragHandle');
-dragHandle.addEventListener('click', ()=>sidebar.classList.toggle('expanded'));
-let touchStartY=null;
-dragHandle.addEventListener('touchstart', e=>{ touchStartY=e.touches[0].clientY; });
+function setSheet(expanded){
+  sidebar.classList.toggle('expanded', !!expanded);
+  dragHandle.setAttribute('aria-expanded', expanded?'true':'false');
+}
+dragHandle.addEventListener('click', ()=>setSheet(!sidebar.classList.contains('expanded')));
+let touchStartY=null, touchMoved=false;
+dragHandle.addEventListener('touchstart', e=>{ touchStartY=e.touches[0].clientY; touchMoved=false; }, {passive:true});
+dragHandle.addEventListener('touchmove', e=>{
+  if(touchStartY!==null && Math.abs(e.touches[0].clientY-touchStartY)>10) touchMoved=true;
+}, {passive:true});
 dragHandle.addEventListener('touchend', e=>{
   if(touchStartY===null) return;
   const dy=e.changedTouches[0].clientY-touchStartY;
-  if(dy<-20) sidebar.classList.add('expanded');
-  if(dy>20) sidebar.classList.remove('expanded');
   touchStartY=null;
+  if(!touchMoved) return; // Tap → Click regelt das
+  e.preventDefault(); // Wisch soll keinen Extra-Click auslösen
+  if(dy<-12) setSheet(true);
+  else if(dy>12) setSheet(false);
 });
 
 /* ===================== ÖFFNUNGSZEITEN 2026 (offiziell: haaner-kirmes.de) ===================== */
