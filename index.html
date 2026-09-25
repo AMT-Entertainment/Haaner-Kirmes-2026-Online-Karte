@@ -130,6 +130,18 @@
   .legend .dot{width:10px;height:10px;border-radius:50%;flex:none;}
   .legend .dot.ride{background:var(--amber);}
   .legend .dot.kids{background:var(--blue);}
+  .legend .wc-swatch{flex:none;min-width:22px;height:18px;border-radius:5px;background:var(--blue);color:#fff;
+    font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+  /* ---- WC pins (kleiner als Fahrgeschäfte) ---- */
+  .wc-pin{width:26px;height:26px;border-radius:8px;background:var(--blue);color:#fff;border:2px solid #fff;
+    box-shadow:0 2px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:800;letter-spacing:.3px;cursor:pointer;font-family:'Inter',sans-serif;}
+  .wc-hero{height:120px;border-radius:12px;background:var(--blue);color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:56px;margin-bottom:16px;position:relative;overflow:hidden;}
+  .wc-thumb{flex:none;width:52px;height:52px;border-radius:10px;background:var(--blue);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-size:15px;font-weight:800;}
+  .wc-section{padding:8px 8px 2px;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
 
   /* ---- filter chips + programm ---- */
   .chip-row{display:flex;gap:6px;padding:0 12px 8px;flex-wrap:wrap;align-items:center;}
@@ -365,6 +377,7 @@
       <div class="legend" id="legendBox">
         <div class="item"><span class="dot ride"></span>Fahrgeschäfte</div>
         <div class="item"><span class="dot kids"></span>Kinder</div>
+        <div class="item"><span class="wc-swatch">WC</span>Toiletten</div>
       </div>
       <div class="loc-banner" id="locBanner">
         <div class="txt"><b>📍 Standort aktivieren?</b><span>Für Live-Navigation zu den Fahrgeschäften in der App.</span></div>
@@ -440,7 +453,9 @@
 
 <script type="application/json" id="ridesData">
 
-[{"id": "riesenrad", "name": "Riesenrad: Sonnenrad", "subtitle": "Der Blick über die Kirmesmeile", "cat": "family", "icon": "ferriswheel", "isNew": false, "operator": "Otto Barth (Bonn)", "location": "Neuer Markt West", "lat": 51.193324, "lng": 7.009631, "desc": "Das große Riesenrad ist traditionell der Startpunkt der Kirmes: Hier findet am Freitag um 16 Uhr die offizielle Eröffnung mit Bürgermeister Vincent Endereß statt. Von oben hat man den besten Überblick über die gesamte Festmeile.", "url": "https://haaner-kirmes.de/riesenrad-sonnenrad/", "rideIndexUrl": "https://ride-index.de/2005/01/13/riesenrad-willenborg-3/"}, {"id": "hawaii", "name": "Hawaii Swing", "subtitle": "Fliegende Ketten mit Tropenflair", "cat": "family", "icon": "swing", "isNew": false, "operator": "Sascha Schaak (Zülpich)", "location": "Windhövelplatz", "lat": 51.193391, "lng": 7.010393, "desc": "Klassisches Kettenkarussell mit Hawaii-Thema: Die Sitze schwingen im Kreis nach außen — ein Muss für alle, die den Fahrtwind lieben, ohne auf Loopings zu stehen.", "url": "https://haaner-kirmes.de/schlittenfahrt-2/", "rideIndexUrl": "https://ride-index.de/2005/01/08/hawaii-swing-schaak/"}, {"id": "nessy", "name": "The Real Nessy", "subtitle": "„Das spritzige Vergnügen“", "cat": "family", "icon": "splash", "isNew": false, "operator": "Hans-Peter Markmann (Bonn)", "location": "Kaiserstraße 5", "lat": 51.191844, "lng": 7.008355, "desc": "Eine Fahrt auf dem Rücken des Ungeheuers von Loch Ness — mit waschechten Wasserspritzern für alle, die an heißen Kirmestagen eine Abkühlung suchen.", "url": "https://haaner-kirmes.de/the-real-nessy/", "rideIndexUrl": "https://ride-index.de/2005/01/11/nessy/"}, {"id": "circuscircus", "name": "Circus Circus", "subtitle": "Rasant, aber familienfreundlich", "cat": "family", "icon": "tent", "isNew": true, "operator": "Circus Circus GmbH & Co. KG (Emstek)", "location": "Neuer Markt", "lat": 51.193203, "lng": 7.010211, "desc": "Neu 2026 in Haan: ein Rundfahrgeschäft mit liebevoll gestalteter Zirkuskulisse, bislang vor allem vom Oktoberfest München bekannt. Rasante, aber familienfreundliche Runden für Jung und Alt.", "url": "https://haaner-kirmes.de/circuscircus/", "rideIndexUrl": "https://ride-index.de/2005/01/04/circus-circus/"}, {"id": "bigben", "name": "Big Ben Tower", "subtitle": "Freier Fall mit Aussicht", "cat": "thrill", "icon": "tower", "isNew": false, "operator": "Dennis Krause GbR (Bielefeld)", "location": "Schillerplatz", "lat": 51.191898, "lng": 7.007958, "desc": "Riesenkettenflieger mit Höhenkick — bis zu 40 Meter hoch, mit schöner Aussicht über den Kirmesplatz. Der genaue Standplatz in Haan wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/bigbentower/", "rideIndexUrl": "https://ride-index.de/2023/07/11/big-ben-tower/"}, {"id": "superhopser", "name": "Super Hopser", "subtitle": "Hüpfvergnügen für Groß und Klein", "cat": "family", "icon": "bounce", "isNew": false, "operator": "Marlon Weihs", "location": "Marktpassage", "lat": 51.192846, "lng": 7.01212, "desc": "Der Schunkler von 1981 sorgt bei bis zu 14 Umdrehungen pro Minute für viel Gelächter — wer nicht aufpasst, landet schnell beim Nachbarn auf dem Schoß. Der genaue Standplatz wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/super-hopser/", "rideIndexUrl": "https://ride-index.de/2005/01/13/super-hopser-weihs/"}, {"id": "jetlag", "name": "Jetlag", "subtitle": "Kreiseln bis der Kopf brummt", "cat": "thrill", "icon": "spin", "isNew": false, "operator": "Mario Weber (Moers)", "location": "Neuer Markt", "lat": 51.193465, "lng": 7.010769, "desc": "Ein schnelles Drehfahrgeschäft mitten auf dem Neuen Markt — für alle, die Zentrifugalkraft lieben. Im Luftfahrt-Look gestaltet, mit Geschwindigkeiten von bis zu 100 km/h.", "url": "https://haaner-kirmes.de/jetlag/", "rideIndexUrl": "https://ride-index.de/2019/05/28/jetlag/"}, {"id": "invader", "name": "Invader", "subtitle": "Breakdance-Neuheit 2026", "cat": "thrill", "icon": "dancer", "isNew": true, "operator": "Marvin Dreßen (Mönchengladbach)", "location": "Neuer Markt", "lat": 51.193048, "lng": 7.009674, "desc": "Ganz neues Rundfahrgeschäft von SAD Maschinenbau, das seine Premiere im Juli 2026 auf der Rheinkirmes Düsseldorf feierte und nun erstmals in Haan gastiert. Platz für 32 Personen in 16 Gondeln.", "url": "https://haaner-kirmes.de/invader/", "rideIndexUrl": "https://ride-index.de/2026/07/17/invader/"}, {"id": "jekyllhyde", "name": "Jekyll & Hyde", "subtitle": "Speed-Fahrgeschäft mit doppeltem Gesicht", "cat": "thrill", "icon": "ghost", "isNew": false, "operator": "Bethel Thelen jr. (Paderborn)", "location": "Dieker Straße", "lat": 51.194004, "lng": 7.012024, "desc": "Kein Geisterbahn-Klassiker, sondern ein rasantes KMG-Speed-Fahrgeschäft: In Einzelsitzen geht es bis zu 42 Meter hoch und mit rund 130 km/h um die Nabe, die auf einer Seite Dr. Jekylls freundliches Gesicht zeigt und auf der Rückseite die Fratze von Mr. Hyde — dazu Nebel-, Feuer- und LED-Effekte.", "url": "https://haaner-kirmes.de/jekyllandhyde/", "rideIndexUrl": "https://ride-index.de/2014/04/23/jekyll-hyde/"}, {"id": "vivacuba", "name": "Viva Cuba", "subtitle": "Laufgeschäft auf 4 Etagen und 5 Ebenen", "cat": "family", "icon": "funhouse", "isNew": true, "operator": "Hartmann & Sohn (Iserlohn)", "location": "Mittelstraße", "lat": 51.194144, "lng": 7.013665, "desc": "Neues Laufgeschäft mit kubanischem Flair — das erste seiner Art in Deutschland, das sich komplett dem Thema Kuba widmet. Wackelböden, Rolltonnen, Zerrspiegel und Wasserspiele über vier Etagen und fünf Ebenen.", "url": "https://haaner-kirmes.de/vivacuba/", "rideIndexUrl": "https://ride-index.de/2005/01/06/viva-cuba-hartmann/"}, {"id": "autoscooter", "name": "Autoscooter Diamond", "subtitle": "Der Kirmes-Klassiker", "cat": "family", "icon": "bumpercar", "isNew": false, "operator": "Hartkopf-Osselmann (Mettmann)", "location": "Alter Markt", "lat": 51.192988, "lng": 7.012421, "desc": "Crashen erlaubt: der traditionelle Autoscooter, erkennbar am markanten Diamanten auf dem Dach, mit 30 modernen Bertazzon-New-York-Fahrzeugen und LED-Beleuchtung.", "url": "https://haaner-kirmes.de/autoscooter/", "rideIndexUrl": "https://ride-index.de/2007/07/10/as-hartkopf-osselmann/"}, {"id": "hoelle", "name": "Fahrt zur Hölle 2.0", "subtitle": "Die runderneuerte Geisterbahn", "cat": "thrill", "icon": "ghost", "isNew": true, "operator": "Hermann Fellerhoff & Söhne (Düsseldorf)", "location": "Rathaus-Parkplatz", "lat": 51.193278, "lng": 7.013633, "desc": "Nach Übernahme durch die als „Grusel-Experten“ bekannte Familie Fellerhoff komplett modernisierte Geisterbahn: 180 Streckenmeter auf zwei Etagen, rund 3 Minuten Fahrzeit — einer der großen Hingucker jeder Kirmes-Saison.", "url": "https://haaner-kirmes.de/fahrtzurhoelle/", "rideIndexUrl": "https://ride-index.de/2005/01/06/fahrt-zur-hoelle/"}, {"id": "musikexpress", "name": "Musik-Express", "subtitle": "Kirmes-Evergreen", "cat": "family", "icon": "musicnote", "isNew": false, "operator": "Eduard Krause KG (Bielefeld)", "location": "Walder Str. / Kaiserstraße", "lat": 51.193412, "lng": 7.014652, "desc": "Musik, Lichter, Tempo: der Musik-Express ist der Evergreen unter den Rundfahrgeschäften und für Generationen von Kirmesbesuchern ein Fixpunkt.", "url": "https://haaner-kirmes.de/musik-express-2/", "rideIndexUrl": "https://ride-index.de/2005/01/10/musik-express-schneider-krause/"}, {"id": "crazydancer", "name": "Crazy Dancer", "subtitle": "Breakdance-Style-Fahrt", "cat": "thrill", "icon": "dancer", "isNew": false, "operator": "Manuel Freiwald (Ankum)", "location": "Kaiserstr. 68, Nebenfahrbahn", "lat": 51.194219, "lng": 7.014534, "desc": "Schnelles Breakdance-Fahrgeschäft (Typ „Scheibenwischer“) in der Nebenfahrbahn der Kaiserstraße — kreiselnd, kippend, mit ordentlich Speed.", "url": "https://haaner-kirmes.de/crazy-dancer/", "rideIndexUrl": "https://ride-index.de/2005/01/04/crazy-dancer/"}, {"id": "hypnotizer", "name": "Hypnotizer", "subtitle": "Pendelschaukel-Neuheit", "cat": "thrill", "icon": "pendulum", "isNew": true, "operator": "Thelen (Paderborn)", "location": "Rathaus-Parkplatz", "lat": 51.193681, "lng": 7.013826, "desc": "Deutschlandweites Unikat: ein KMG „Sicko“, dessen Rückwand ein animierter Sensenmann mit den Gondeln mitverfolgenden Augen ziert. Premiere war im April 2026 auf dem Frühlingsfest Hannover. Der genaue Standplatz in Haan wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/hypnotizer/", "rideIndexUrl": "https://ride-index.de/2026/04/02/hypnotizer/"}, {"id": "pocoloco", "name": "Poco Loco", "subtitle": "„Ein bisschen verrückt“ — Neuheit 2026", "cat": "family", "icon": "funhouse", "isNew": true, "operator": "Maximilian Schultze (Bochum)", "location": "Kaiserstraße", "lat": 51.191966, "lng": 7.009556, "desc": "Eines der sechs neuen Fahrgeschäfte 2026: ein neues Laufgeschäft von Dietz Fahrzeugbau, das im März 2026 auf der Palmkirmes Recklinghausen Premiere feierte und der Kaiserstraße nun mehr Vielfalt verleiht.", "url": "https://haaner-kirmes.de/pocoloco/", "rideIndexUrl": "https://ride-index.de/?s=Poco+Loco"}, {"id": "wellenflug", "name": "Wellenflug", "subtitle": "Kettenflieger über dem Neuen Markt", "cat": "family", "icon": "wave", "isNew": false, "operator": "Hanstein", "location": "Neuer Markt 22", "lat": 51.19339, "lng": 7.01193, "desc": "Der Kettenflieger auf dem Neuen Markt: Die Sitze schweben nach außen – mit schönem Blick über die Kirmesmeile. Ein Klassiker für die ganze Familie.", "url": "https://haaner-kirmes.de/fahrgeschaefte/"}, {"id": "kids", "name": "Kinder-Fahrgeschäfte", "subtitle": "11 Fahrgeschäfte für die Kleinsten", "cat": "kids", "icon": "carousel", "isNew": false, "operator": "verschiedene Schausteller", "location": "verteilt rund um Alter Markt / Kaiserstraße", "lat": 51.19247, "lng": 7.010694, "desc": "Highway Rally, Toy Story Wheel, Crazy Clown, Kid´s Rally, Mini-Autoscooter, Crazy Time 2, Barock-Kinderflieger, Bounty, Balluna, Kinderkarussell und Willy der Wurm — elf eigene Kinderfahrgeschäfte für alle Altersklassen.", "url": "https://haaner-kirmes.de/kinder-fahrgeschaefte/", "rideIndexUrl": "https://ride-index.de/category/kindergeschaefte-aktiv/"}]
+
+[{"id": "riesenrad", "name": "Riesenrad: Sonnenrad", "subtitle": "Der Blick über die Kirmesmeile", "cat": "family", "icon": "ferriswheel", "isNew": false, "operator": "Otto Barth (Bonn)", "location": "Neuer Markt West", "lat": 51.193324, "lng": 7.009631, "desc": "Das große Riesenrad ist traditionell der Startpunkt der Kirmes: Hier findet am Freitag um 16 Uhr die offizielle Eröffnung mit Bürgermeister Vincent Endereß statt. Von oben hat man den besten Überblick über die gesamte Festmeile.", "url": "https://haaner-kirmes.de/riesenrad-sonnenrad/", "rideIndexUrl": "https://ride-index.de/2005/01/13/riesenrad-willenborg-3/"}, {"id": "hawaii", "name": "Hawaii Swing", "subtitle": "Fliegende Ketten mit Tropenflair", "cat": "family", "icon": "swing", "isNew": false, "operator": "Sascha Schaak (Zülpich)", "location": "Windhövelplatz", "lat": 51.193391, "lng": 7.010393, "desc": "Klassisches Kettenkarussell mit Hawaii-Thema: Die Sitze schwingen im Kreis nach außen — ein Muss für alle, die den Fahrtwind lieben, ohne auf Loopings zu stehen.", "url": "https://haaner-kirmes.de/schlittenfahrt-2/", "rideIndexUrl": "https://ride-index.de/2005/01/08/hawaii-swing-schaak/"}, {"id": "nessy", "name": "The Real Nessy", "subtitle": "„Das spritzige Vergnügen“", "cat": "family", "icon": "splash", "isNew": false, "operator": "Hans-Peter Markmann (Bonn)", "location": "Kaiserstraße 5", "lat": 51.191844, "lng": 7.008355, "desc": "Eine Fahrt auf dem Rücken des Ungeheuers von Loch Ness — mit waschechten Wasserspritzern für alle, die an heißen Kirmestagen eine Abkühlung suchen.", "url": "https://haaner-kirmes.de/the-real-nessy/", "rideIndexUrl": "https://ride-index.de/2005/01/11/nessy/"}, {"id": "circuscircus", "name": "Circus Circus", "subtitle": "Rasant, aber familienfreundlich", "cat": "family", "icon": "tent", "isNew": true, "operator": "Circus Circus GmbH & Co. KG (Emstek)", "location": "Neuer Markt", "lat": 51.193203, "lng": 7.010211, "desc": "Neu 2026 in Haan: ein Rundfahrgeschäft mit liebevoll gestalteter Zirkuskulisse, bislang vor allem vom Oktoberfest München bekannt. Rasante, aber familienfreundliche Runden für Jung und Alt.", "url": "https://haaner-kirmes.de/circuscircus/", "rideIndexUrl": "https://ride-index.de/2005/01/04/circus-circus/"}, {"id": "bigben", "name": "Big Ben Tower", "subtitle": "Freier Fall mit Aussicht", "cat": "thrill", "icon": "tower", "isNew": false, "operator": "Dennis Krause GbR (Bielefeld)", "location": "Schillerplatz", "lat": 51.191898, "lng": 7.007958, "desc": "Riesenkettenflieger mit Höhenkick — bis zu 40 Meter hoch, mit schöner Aussicht über den Kirmesplatz. Der genaue Standplatz in Haan wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/bigbentower/", "rideIndexUrl": "https://ride-index.de/2023/07/11/big-ben-tower/"}, {"id": "superhopser", "name": "Super Hopser", "subtitle": "Hüpfvergnügen für Groß und Klein", "cat": "family", "icon": "bounce", "isNew": false, "operator": "Marlon Weihs", "location": "Marktpassage", "lat": 51.192846, "lng": 7.01212, "desc": "Der Schunkler von 1981 sorgt bei bis zu 14 Umdrehungen pro Minute für viel Gelächter — wer nicht aufpasst, landet schnell beim Nachbarn auf dem Schoß. Der genaue Standplatz wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/super-hopser/", "rideIndexUrl": "https://ride-index.de/2005/01/13/super-hopser-weihs/"}, {"id": "jetlag", "name": "Jetlag", "subtitle": "Kreiseln bis der Kopf brummt", "cat": "thrill", "icon": "spin", "isNew": false, "operator": "Mario Weber (Moers)", "location": "Neuer Markt", "lat": 51.193465, "lng": 7.010769, "desc": "Ein schnelles Drehfahrgeschäft mitten auf dem Neuen Markt — für alle, die Zentrifugalkraft lieben. Im Luftfahrt-Look gestaltet, mit Geschwindigkeiten von bis zu 100 km/h.", "url": "https://haaner-kirmes.de/jetlag/", "rideIndexUrl": "https://ride-index.de/2019/05/28/jetlag/"}, {"id": "invader", "name": "Invader", "subtitle": "Breakdance-Neuheit 2026", "cat": "thrill", "icon": "dancer", "isNew": true, "operator": "Marvin Dreßen (Mönchengladbach)", "location": "Neuer Markt", "lat": 51.193048, "lng": 7.009674, "desc": "Ganz neues Rundfahrgeschäft von SAD Maschinenbau, das seine Premiere im Juli 2026 auf der Rheinkirmes Düsseldorf feierte und nun erstmals in Haan gastiert. Platz für 32 Personen in 16 Gondeln.", "url": "https://haaner-kirmes.de/invader/", "rideIndexUrl": "https://ride-index.de/2026/07/17/invader/"}, {"id": "jekyllhyde", "name": "Jekyll & Hyde", "subtitle": "Speed-Fahrgeschäft mit doppeltem Gesicht", "cat": "thrill", "icon": "ghost", "isNew": false, "operator": "Bethel Thelen jr. (Paderborn)", "location": "Dieker Straße", "lat": 51.194004, "lng": 7.012024, "desc": "Kein Geisterbahn-Klassiker, sondern ein rasantes KMG-Speed-Fahrgeschäft: In Einzelsitzen geht es bis zu 42 Meter hoch und mit rund 130 km/h um die Nabe, die auf einer Seite Dr. Jekylls freundliches Gesicht zeigt und auf der Rückseite die Fratze von Mr. Hyde — dazu Nebel-, Feuer- und LED-Effekte.", "url": "https://haaner-kirmes.de/jekyllandhyde/", "rideIndexUrl": "https://ride-index.de/2014/04/23/jekyll-hyde/"}, {"id": "vivacuba", "name": "Viva Cuba", "subtitle": "Laufgeschäft auf 4 Etagen und 5 Ebenen", "cat": "family", "icon": "funhouse", "isNew": true, "operator": "Hartmann & Sohn (Iserlohn)", "location": "Mittelstraße", "lat": 51.194144, "lng": 7.013665, "desc": "Neues Laufgeschäft mit kubanischem Flair — das erste seiner Art in Deutschland, das sich komplett dem Thema Kuba widmet. Wackelböden, Rolltonnen, Zerrspiegel und Wasserspiele über vier Etagen und fünf Ebenen.", "url": "https://haaner-kirmes.de/vivacuba/", "rideIndexUrl": "https://ride-index.de/2005/01/06/viva-cuba-hartmann/"}, {"id": "autoscooter", "name": "Autoscooter Diamond", "subtitle": "Der Kirmes-Klassiker", "cat": "family", "icon": "bumpercar", "isNew": false, "operator": "Hartkopf-Osselmann (Mettmann)", "location": "Alter Markt", "lat": 51.192988, "lng": 7.012421, "desc": "Crashen erlaubt: der traditionelle Autoscooter, erkennbar am markanten Diamanten auf dem Dach, mit 30 modernen Bertazzon-New-York-Fahrzeugen und LED-Beleuchtung.", "url": "https://haaner-kirmes.de/autoscooter/", "rideIndexUrl": "https://ride-index.de/2007/07/10/as-hartkopf-osselmann/"}, {"id": "hoelle", "name": "Fahrt zur Hölle 2.0", "subtitle": "Die runderneuerte Geisterbahn", "cat": "thrill", "icon": "ghost", "isNew": true, "operator": "Hermann Fellerhoff & Söhne (Düsseldorf)", "location": "Rathaus-Parkplatz", "lat": 51.193278, "lng": 7.013633, "desc": "Nach Übernahme durch die als „Grusel-Experten“ bekannte Familie Fellerhoff komplett modernisierte Geisterbahn: 180 Streckenmeter auf zwei Etagen, rund 3 Minuten Fahrzeit — einer der großen Hingucker jeder Kirmes-Saison.", "url": "https://haaner-kirmes.de/fahrtzurhoelle/", "rideIndexUrl": "https://ride-index.de/2005/01/06/fahrt-zur-hoelle/"}, {"id": "musikexpress", "name": "Musik-Express", "subtitle": "Kirmes-Evergreen", "cat": "family", "icon": "musicnote", "isNew": false, "operator": "Eduard Krause KG (Bielefeld)", "location": "Walder Str. / Kaiserstraße", "lat": 51.193412, "lng": 7.014652, "desc": "Musik, Lichter, Tempo: der Musik-Express ist der Evergreen unter den Rundfahrgeschäften und für Generationen von Kirmesbesuchern ein Fixpunkt.", "url": "https://haaner-kirmes.de/musik-express-2/", "rideIndexUrl": "https://ride-index.de/2005/01/10/musik-express-schneider-krause/"}, {"id": "crazydancer", "name": "Crazy Dancer", "subtitle": "Breakdance-Style-Fahrt", "cat": "thrill", "icon": "dancer", "isNew": false, "operator": "Manuel Freiwald (Ankum)", "location": "Kaiserstr. 68, Nebenfahrbahn", "lat": 51.194219, "lng": 7.014534, "desc": "Schnelles Breakdance-Fahrgeschäft (Typ „Scheibenwischer“) in der Nebenfahrbahn der Kaiserstraße — kreiselnd, kippend, mit ordentlich Speed.", "url": "https://haaner-kirmes.de/crazy-dancer/", "rideIndexUrl": "https://ride-index.de/2005/01/04/crazy-dancer/"}, {"id": "hypnotizer", "name": "Hypnotizer", "subtitle": "Pendelschaukel-Neuheit", "cat": "thrill", "icon": "pendulum", "isNew": true, "operator": "Thelen (Paderborn)", "location": "Rathaus-Parkplatz", "lat": 51.193681, "lng": 7.013826, "desc": "Deutschlandweites Unikat: ein KMG „Sicko“, dessen Rückwand ein animierter Sensenmann mit den Gondeln mitverfolgenden Augen ziert. Premiere war im April 2026 auf dem Frühlingsfest Hannover. Der genaue Standplatz in Haan wurde von den Veranstaltern noch nicht bestätigt.", "url": "https://haaner-kirmes.de/hypnotizer/", "rideIndexUrl": "https://ride-index.de/2026/04/02/hypnotizer/"}, {"id": "pocoloco", "name": "Poco Loco", "subtitle": "„Ein bisschen verrückt“ — Neuheit 2026", "cat": "family", "icon": "funhouse", "isNew": true, "operator": "Maximilian Schultze (Bochum)", "location": "Kaiserstraße", "lat": 51.191966, "lng": 7.009556, "desc": "Eines der sechs neuen Fahrgeschäfte 2026: ein neues Laufgeschäft von Dietz Fahrzeugbau, das im März 2026 auf der Palmkirmes Recklinghausen Premiere feierte und der Kaiserstraße nun mehr Vielfalt verleiht.", "url": "https://haaner-kirmes.de/pocoloco/", "rideIndexUrl": "https://ride-index.de/?s=Poco+Loco"}, {"id": "wellenflug", "name": "Wellenflug", "subtitle": "Kettenflieger über dem Neuen Markt", "cat": "family", "icon": "wave", "isNew": false, "operator": "Hanstein", "location": "Neuer Markt 22", "lat": 51.19339, "lng": 7.01193, "desc": "Der Kettenflieger auf dem Neuen Markt: Die Sitze schweben nach außen – mit schönem Blick über die Kirmesmeile. Ein Klassiker für die ganze Familie.", "url": "https://haaner-kirmes.de/fahrgeschaefte/"}, {"id": "willy", "name": "Willy der Wurm", "subtitle": "Kinderachterbahn für die Kleinsten", "cat": "kids", "icon": "coaster", "isNew": false, "operator": "Bauermeister", "location": "Kaiserstraße", "lat": 51.193778, "lng": 7.014611, "desc": "Der beliebte Kinder-Coaster darf in Haan nicht fehlen: Mit dem freundlichen Wurm geht es über sanfte Hügel – genau richtig für kleine Kirmesfans und ihre erste Achterbahnfahrt.", "url": "https://haaner-kirmes.de/willy/", "rideIndexUrl": "https://ride-index.de/2010/04/21/willy-der-wurm-bauermeister/"}, {"id": "kids", "name": "Kinder-Fahrgeschäfte", "subtitle": "11 Fahrgeschäfte für die Kleinsten", "cat": "kids", "icon": "carousel", "isNew": false, "operator": "verschiedene Schausteller", "location": "verteilt rund um Alter Markt / Kaiserstraße", "lat": 51.19247, "lng": 7.010694, "desc": "Highway Rally, Toy Story Wheel, Crazy Clown, Kid´s Rally, Mini-Autoscooter, Crazy Time 2, Barock-Kinderflieger, Bounty, Balluna, Kinderkarussell und Willy der Wurm — elf eigene Kinderfahrgeschäfte für alle Altersklassen.", "url": "https://haaner-kirmes.de/kinder-fahrgeschaefte/", "rideIndexUrl": "https://ride-index.de/category/kindergeschaefte-aktiv/"}]
+
 
 </script>
 
@@ -467,6 +482,7 @@ const RIDE_IMGS = {
   hypnotizer: 'https://ride-index.de/wp-content/uploads/2026/04/Thelen-Hypnotizer-Fahrt-2026-L2.jpg',
   pocoloco: 'https://ride-index.de/wp-content/uploads/2026/03/POCOLOCO_SchultzebyMPasslack2026.jpg',
   wellenflug: 'https://ride-index.de/wp-content/uploads/2005/01/WELLENFLUG-Hanstein2026-5.jpg',
+  willy: 'https://ride-index.de/wp-content/uploads/2010/04/WILLYDERWURM-Bauermeister2026.jpg',
   kids: null
 };
 RIDES.forEach(r=>{ if(RIDE_IMGS[r.id]) r.img = RIDE_IMGS[r.id]; });
@@ -487,6 +503,7 @@ const ICONS = {
   pendulum: `<path d="M12 3v4"/><path d="M4 7h16"/><path d="M6 7l6 12 6-12"/><circle cx="12" cy="19" r="1.6"/>`,
   wave: `<path d="M4 5h16"/><path d="M12 5v3"/><path d="M5 13c1.6-2.2 3.4-2.2 5 0s3.4 2.2 5 0 2.8-2 4-1"/><path d="M7.5 11.5V16M12 12v4.5M16.5 11.5V16"/><circle cx="7.5" cy="17.5" r="1.2"/><circle cx="12" cy="18" r="1.2"/><circle cx="16.5" cy="17.5" r="1.2"/>`,
   carousel: `<path d="M12 3v4"/><path d="M6 10l6-3 6 3"/><path d="M4 21l2-9h12l2 9"/><path d="M9 21v-5M15 21v-5M12 21v-6"/>`,
+  coaster: `<path d="M2 19c3-9 6-9 8-5s4 1 6-3 3-4 4-3"/><rect x="8.5" y="14.5" width="5" height="3" rx="1"/><circle cx="10" cy="20" r="1"/><circle cx="14" cy="20" r="1"/>`,
 };
 function iconSvg(key){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[key]||ICONS.spin}</svg>`; }
 function colorGroup(cat){ return cat==='kids' ? 'kids' : 'ride'; }
@@ -513,6 +530,38 @@ RIDES.forEach(r=>{
   m.on('click', ()=>openDetail(r.id));
   m.addTo(map);
   markers[r.id] = m;
+});
+
+/* ===================== TOILETTEN (WC) ===================== */
+const WC_SPOTS = [
+  {id:'wc1', n:1, lat:51.191361, lng:7.008056},
+  {id:'wc2', n:2, lat:51.192111, lng:7.011361},
+  {id:'wc3', n:3, lat:51.193611, lng:7.009944},
+  {id:'wc4', n:4, lat:51.194111, lng:7.010944},
+  {id:'wc5', n:5, lat:51.194222, lng:7.011833},
+  {id:'wc6', n:6, lat:51.193306, lng:7.012917},
+  {id:'wc7', n:7, lat:51.193111, lng:7.013806},
+  {id:'wc8', n:8, lat:51.193250, lng:7.014194},
+  {id:'wc9', n:9, lat:51.194361, lng:7.013972},
+  {id:'wc10', n:10, lat:51.193611, lng:7.014694},
+];
+WC_SPOTS.forEach(w=>{
+  w.name=`WC ${w.n}`;
+  w.subtitle='Öffentliche Toilette';
+  w.location='Kirmesgelände';
+});
+function makeWcIcon(){
+  return L.divIcon({
+    className:'div-pin', iconSize:[26,26], iconAnchor:[13,25], popupAnchor:[0,-22],
+    html:'<div class="wc-pin">WC</div>'
+  });
+}
+const wcMarkers = {};
+WC_SPOTS.forEach(w=>{
+  const m = L.marker([w.lat, w.lng], {icon:makeWcIcon(), title:w.name+' – '+w.subtitle});
+  m.on('click', ()=>openWcDetail(w.id));
+  m.addTo(map);
+  wcMarkers[w.id] = m;
 });
 
 
@@ -564,6 +613,32 @@ function renderList(){
     div.addEventListener('click', ()=>{ openDetail(r.id); map.panTo([r.lat,r.lng]); });
     listEl.appendChild(div);
   });
+  /* Toiletten am Listenende (nur in „Alle“, passend zur Suche) */
+  if(activeCat==='all'){
+    const wcShown = WC_SPOTS.filter(w=>{
+      if(!searchTerm) return true;
+      return (w.name+' '+w.subtitle+' '+w.location).toLowerCase().includes(searchTerm);
+    });
+    if(wcShown.length){
+      const head=document.createElement('div');
+      head.className='wc-section';
+      head.textContent=`🚻 Toiletten (${wcShown.length})`;
+      listEl.appendChild(head);
+      wcShown.forEach(w=>{
+        const div=document.createElement('div');
+        div.className='ride-card'+(selectedId==='@'+w.id?' active':'');
+        div.innerHTML=`
+          <div class="wc-thumb">WC</div>
+          <div class="ride-meta">
+            <div class="name">${w.name}</div>
+            <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12A7 7 0 0 0 5 10c0 4.6 7 12 7 12Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+            <span>${w.subtitle} · ${w.location}</span></div>
+          </div>`;
+        div.addEventListener('click', ()=>{ openWcDetail(w.id); map.panTo([w.lat,w.lng]); });
+        listEl.appendChild(div);
+      });
+    }
+  }
 }
 const searchInput=document.getElementById('searchInput');
 const searchBox=document.getElementById('searchBox');
@@ -643,6 +718,35 @@ function closeDetail(){
   detail.classList.remove('show'); backdrop.classList.remove('show'); selectedId=null; renderList();
   try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
 }
+function openWcDetail(id){
+  const w = WC_SPOTS.find(x=>x.id===id);
+  if(!w) return;
+  selectedId='@'+id; renderList();
+  const {gUrl,aUrl} = routeUrls(w);
+  detailBody.innerHTML = `
+    <div class="wc-hero">🚻</div>
+    <h2>${w.name}</h2>
+    <div class="subtitle">${w.subtitle} · ${w.location}</div>
+    <div class="badge-row"><span class="badge kids">🚻 WC</span></div>
+    <div id="navDistRow" style="font-size:13px;color:var(--muted);margin:4px 0 0;"></div>
+    <div class="meta-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12A7 7 0 0 0 5 10c0 4.6 7 12 7 12Z"/><circle cx="12" cy="10" r="2.4"/></svg><div class="k">Standort</div><div>${w.location} · ${w.lat.toFixed(5)}, ${w.lng.toFixed(5)}</div></div>
+    <div class="actions">
+      <button class="btn primary" id="inAppNavBtn">🧭 In dieser App hinführen</button>
+      <button class="btn" id="shareBtn">🔗 Link zu diesem WC kopieren</button>
+      <a class="btn primary" style="background:#0b5f0b;" href="${gUrl}" target="_blank" rel="noopener">Route via Google Maps</a>
+      <a class="btn" href="${aUrl}" target="_blank" rel="noopener">Route via Apple Maps</a>
+    </div>
+  `;
+  detail.classList.add('show'); backdrop.classList.add('show');
+  try{ history.replaceState(null,'','#'+w.id); }catch(e){}
+  document.getElementById('inAppNavBtn').addEventListener('click', ()=>startWcNavigation(w.id));
+  document.getElementById('shareBtn').addEventListener('click', async ()=>{
+    const link=location.href.split('#')[0]+'#'+w.id;
+    try{ await navigator.clipboard.writeText(link); showToast('Link kopiert – teilen per WhatsApp & Co. 📲', 3000); }
+    catch(e){ prompt('Link kopieren:', link); }
+  });
+  updateNavDistRow(w);
+}
 document.getElementById('detailClose').addEventListener('click', closeDetail);
 backdrop.addEventListener('click', closeDetail);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
@@ -661,7 +765,7 @@ const navTitle=document.getElementById('navTitle');
 const navSub=document.getElementById('navSub');
 const navProg=document.getElementById('navProg');
 document.getElementById('navStop').addEventListener('click', stopNavigation);
-let youMarker=null, watchId=null, navTargetId=null, navLine=null, headingDeg=null;
+let youMarker=null, watchId=null, navTarget=null, navLine=null, headingDeg=null; // navTarget: {lat,lng,name}
 
 function haversine(lat1,lng1,lat2,lng2){
   const R=6371000, toRad=d=>d*Math.PI/180;
@@ -700,12 +804,12 @@ function onPosUpdate(pos, firstFix){
   updateYouMarker();
   setLocUI(true);
   const distC = haversine(userPos.lat,userPos.lng, 51.1934, 7.0129);
-  if(!navTargetId){
-    geoStatus.innerHTML = `<b>Standort aktiv.</b> ~${Math.round(distC)} m vom Neuen Markt entfernt. Navigation: Fahrgeschäft wählen → „In dieser App hinführen".`;
+  if(!navTarget){
+    geoStatus.innerHTML = `<b>Standort aktiv.</b> ~${Math.round(distC)} m vom Neuen Markt entfernt. Navigation: Fahrgeschäft oder WC wählen → „In dieser App hinführen".`;
     geoStatus.classList.add('show');
   }
   if(firstFix) map.setView([userPos.lat,userPos.lng], Math.max(map.getZoom(), 16));
-  if(navTargetId) updateNavUI();
+  if(navTarget) updateNavUI();
   const r = selectedId && RIDES.find(x=>x.id===selectedId);
   if(r) updateNavDistRow(r);
 }
@@ -755,7 +859,7 @@ navMute.addEventListener('click', ()=>{
   voiceOn = !voiceOn;
   navMute.textContent = voiceOn ? '🔊' : '🔇';
   if(!voiceOn && 'speechSynthesis' in window) speechSynthesis.cancel();
-  else if(voiceOn && navTargetId) speak('Sprachansage an.');
+  else if(voiceOn && navTarget) speak('Sprachansage an.');
 });
 function speak(text){
   if(!voiceOn || !('speechSynthesis' in window) || !text) return;
@@ -789,7 +893,16 @@ function updateNavDistRow(r){
 function startNavigation(id){
   const r = RIDES.find(x=>x.id===id);
   if(!r) return;
-  navTargetId=id; routeData=null; lastStepKey=''; arrivedSpoken=false; lastSpeakDist=0; lastRouteFetch=0; lastRoutePos=null;
+  beginNav(r.lat, r.lng, r.name);
+}
+function startWcNavigation(id){
+  const w = WC_SPOTS.find(x=>x.id===id);
+  if(!w) return;
+  beginNav(w.lat, w.lng, w.name+' – '+w.subtitle);
+}
+function beginNav(lat,lng,name){
+  const r = {lat, lng, name};
+  navTarget=r; routeData=null; lastStepKey=''; arrivedSpoken=false; lastSpeakDist=0; lastRouteFetch=0; lastRoutePos=null;
   closeDetail();
   document.getElementById('legendBox').style.display='none';
   locBanner.classList.add('hidden');
@@ -808,7 +921,7 @@ function startNavigation(id){
   showToast('Echte Fußroute + 🔊 Ansage. Folge der blauen Linie.', 3000);
 }
 async function fetchRoute(force){
-  const r = RIDES.find(x=>x.id===navTargetId);
+  const r = navTarget;
   if(!r || !userPos) return;
   const now = Date.now();
   if(!force && lastRoutePos && haversine(userPos.lat,userPos.lng,lastRoutePos.lat,lastRoutePos.lng) < 25 && now - lastRouteFetch < 15000) return;
@@ -837,7 +950,7 @@ async function fetchRoute(force){
   }catch(e){ drawFallback(r); }
 }
 function drawRoute(){
-  const r = RIDES.find(x=>x.id===navTargetId);
+  const r = navTarget;
   if(!r || !routeData) return;
   if(navLine) map.removeLayer(navLine);
   const latlngs = routeData.geometry.coordinates.map(c=>[c[1],c[0]]);
@@ -877,7 +990,7 @@ function drawFallback(r){
   try{ map.fitBounds(navLine.getBounds().pad(0.35), {animate:true}); }catch(e){}
 }
 function updateNavUI(force){
-  const r = RIDES.find(x=>x.id===navTargetId);
+  const r = navTarget;
   if(!r || !userPos){
     if(r){ navTitle.textContent=r.name; navSub.textContent='Warte auf GPS …'; }
     return;
@@ -894,7 +1007,7 @@ function updateNavUI(force){
   }
 }
 function stopNavigation(){
-  navTargetId=null; routeData=null;
+  navTarget=null; routeData=null;
   navBar.classList.remove('show');
   navNext.style.display='none';
   document.getElementById('legendBox').style.display='';
@@ -1035,13 +1148,17 @@ buildHoursList();
   lb.title='Tippen zum Ein-/Ausklappen';
   lb.addEventListener('click', ()=>lb.classList.toggle('mini'));
 })();
-/* Deep-Link: #fahrgeschaeft-id öffnet direkt das Detail */
+/* Deep-Link: #fahrgeschaeft-id oder #wc1…#wc10 öffnet direkt das Detail */
 (function(){
   const id=(location.hash||'').replace('#','');
   if(id && RIDES.some(r=>r.id===id)){
     const r=RIDES.find(x=>x.id===id);
     map.setView([r.lat,r.lng], 17);
     openDetail(id);
+  } else if(id && WC_SPOTS.some(w=>w.id===id)){
+    const w=WC_SPOTS.find(x=>x.id===id);
+    map.setView([w.lat,w.lng], 17);
+    openWcDetail(id);
   }
 })();
 </script>
